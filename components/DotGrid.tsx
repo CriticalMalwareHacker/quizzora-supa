@@ -6,16 +6,20 @@ import { InertiaPlugin } from 'gsap/InertiaPlugin';
 gsap.registerPlugin(InertiaPlugin);
 
 // FIX 1: Type-safe throttle function (Kept from previous fix)
-const throttle = <T extends (...args: unknown[]) => void>(func: T, limit: number) => {
+const throttle = <T extends unknown[]>(
+  func: (...args: T) => void,
+  limit: number
+): ((...args: T) => void) => {
   let lastCall = 0;
-  return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
+  return function (...args: T) {
     const now = performance.now();
     if (now - lastCall >= limit) {
       lastCall = now;
-      func.apply(this, args);
+      func(...args);
     }
   };
 };
+
 
 interface Dot {
   cx: number;
@@ -162,22 +166,29 @@ const DotGrid: React.FC<DotGridProps> = ({
   }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
 
   useEffect(() => {
-    buildGrid();
-    let ro: ResizeObserver | null = null;
-    if ('ResizeObserver' in window) {
-      ro = new ResizeObserver(buildGrid);
-      // FIX 2: Explicit if statement (Kept from previous fix)
-      if (wrapperRef.current) {
-        ro.observe(wrapperRef.current);
-      }
-    } else {
-      window.addEventListener('resize', buildGrid);
+  buildGrid();
+  
+  let ro: ResizeObserver | null = null;
+  
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(buildGrid);
+    if (wrapperRef.current) {
+      ro.observe(wrapperRef.current);
     }
-    return () => {
-      if (ro) ro.disconnect();
-      else window.removeEventListener('resize', buildGrid);
-    };
-  }, [buildGrid]);
+  } else {
+    window.addEventListener('resize', buildGrid);
+  }
+  
+  return () => {
+    if (ro) {
+      ro.disconnect();
+    } else {
+      window.removeEventListener('resize', buildGrid);
+    }
+  };
+}, [buildGrid]);
+
+
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
