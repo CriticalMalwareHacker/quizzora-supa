@@ -6,7 +6,7 @@ import { InertiaPlugin } from 'gsap/InertiaPlugin';
 gsap.registerPlugin(InertiaPlugin);
 
 // FIX 1: Type-safe throttle function (Kept from previous fix)
-const throttle = <T extends (...args: any[]) => void>(func: T, limit: number) => {
+const throttle = <T extends (...args: unknown[]) => void>(func: T, limit: number) => {
   let lastCall = 0;
   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {
     const now = performance.now();
