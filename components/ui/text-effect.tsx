@@ -225,7 +225,7 @@ export function TextEffect({
   style,
 }: TextEffectProps) {
   const segments = splitText(children, per);
-  const MotionTag = motion[as as keyof typeof motion] as typeof motion.div;
+  const MotionTag = (motion as any)[as] || motion.div;
 
   const baseVariants = preset
     ? presetVariants[preset]
