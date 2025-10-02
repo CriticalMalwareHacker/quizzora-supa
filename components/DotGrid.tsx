@@ -5,21 +5,16 @@ import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
 gsap.registerPlugin(InertiaPlugin);
 
-// throttle and hexToRgb functions remain the same...
-const throttle = <T extends unknown[]>(
-  func: (...args: T) => void,
-  limit: number
-): ((...args: T) => void) => {
+const throttle = (func: (...args: any[]) => void, limit: number) => {
   let lastCall = 0;
-  return function (...args: T) {
+  return function (this: any, ...args: any[]) {
     const now = performance.now();
     if (now - lastCall >= limit) {
       lastCall = now;
-      func(...args);
+      func.apply(this, args);
     }
   };
 };
-
 
 interface Dot {
   cx: number;
@@ -54,7 +49,6 @@ function hexToRgb(hex: string) {
     b: parseInt(m[3], 16)
   };
 }
-
 
 const DotGrid: React.FC<DotGridProps> = ({
   dotSize = 16,
@@ -96,7 +90,6 @@ const DotGrid: React.FC<DotGridProps> = ({
     return p;
   }, [dotSize]);
 
-  // buildGrid, useEffect for drawing, resizing, and mouse events remain the same...
   const buildGrid = useCallback(() => {
     const wrap = wrapperRef.current;
     const canvas = canvasRef.current;
@@ -197,116 +190,101 @@ const DotGrid: React.FC<DotGridProps> = ({
     };
   }, [buildGrid]);
 
-useEffect(() => {
-  const onMove = (e: MouseEvent) => {
-    const now = performance.now();
-    const pr = pointerRef.current;
-
-    const dt = pr.lastTime ? now - pr.lastTime : 16;
-    const dx = e.clientX - pr.lastX;
-    const dy = e.clientY - pr.lastY;
-
-    let vx = (dx / dt) * 1000;
-    let vy = (dy / dt) * 1000;
-    let speed = Math.hypot(vx, vy);
-
-    if (speed > maxSpeed) {
-      const scale = maxSpeed / speed;
-      vx *= scale;
-      vy *= scale;
-      speed = maxSpeed;
-    }
-
-    pr.lastTime = now;
-    pr.lastX = e.clientX;
-    pr.lastY = e.clientY;
-    pr.vx = vx;
-    pr.vy = vy;
-    pr.speed = speed;
-
-    const rect = canvasRef.current!.getBoundingClientRect();
-    pr.x = e.clientX - rect.left;
-    pr.y = e.clientY - rect.top;
-
-    for (const dot of dotsRef.current) {
-      const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
-      if (speed > speedTrigger && dist < proximity && !dot._inertiaApplied) {
-        dot._inertiaApplied = true;
-        gsap.killTweensOf(dot);
-
-        const pushX = dot.cx - pr.x + vx * 0.005;
-        const pushY = dot.cy - pr.y + vy * 0.005;
-
-        gsap.to(dot, {
-          inertia: { xOffset: pushX, yOffset: pushY, resistance },
-          onComplete: () => {
-            gsap.to(dot, {
-              xOffset: 0,
-              yOffset: 0,
-              duration: returnDuration,
-              ease: 'elastic.out(1,0.75)',
-              onComplete: () => {
-                dot._inertiaApplied = false;
-              },
-            });
-          },
-        });
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const now = performance.now();
+      const pr = pointerRef.current;
+      const dt = pr.lastTime ? now - pr.lastTime : 16;
+      const dx = e.clientX - pr.lastX;
+      const dy = e.clientY - pr.lastY;
+      let vx = (dx / dt) * 1000;
+      let vy = (dy / dt) * 1000;
+      let speed = Math.hypot(vx, vy);
+      if (speed > maxSpeed) {
+        const scale = maxSpeed / speed;
+        vx *= scale;
+        vy *= scale;
+        speed = maxSpeed;
       }
-    }
-  };
+      pr.lastTime = now;
+      pr.lastX = e.clientX;
+      pr.lastY = e.clientY;
+      pr.vx = vx;
+      pr.vy = vy;
+      pr.speed = speed;
 
-  const onClick = (e: MouseEvent) => {
-    const rect = canvasRef.current!.getBoundingClientRect();
-    const cx = e.clientX - rect.left;
-    const cy = e.clientY - rect.top;
+      const rect = canvasRef.current!.getBoundingClientRect();
+      pr.x = e.clientX - rect.left;
+      pr.y = e.clientY - rect.top;
 
-    for (const dot of dotsRef.current) {
-      const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
-      if (dist < shockRadius && !dot._inertiaApplied) {
-        dot._inertiaApplied = true;
-        gsap.killTweensOf(dot);
-
-        const falloff = Math.max(0, 1 - dist / shockRadius);
-        const pushX = (dot.cx - cx) * shockStrength * falloff;
-        const pushY = (dot.cy - cy) * shockStrength * falloff;
-
-        gsap.to(dot, {
-          inertia: { xOffset: pushX, yOffset: pushY, resistance },
-          onComplete: () => {
-            gsap.to(dot, {
-              xOffset: 0,
-              yOffset: 0,
-              duration: returnDuration,
-              ease: 'elastic.out(1,0.75)',
-              onComplete: () => {
-                dot._inertiaApplied = false;
-              },
-            });
-          },
-        });
+      for (const dot of dotsRef.current) {
+        const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
+        if (speed > speedTrigger && dist < proximity && !dot._inertiaApplied) {
+          dot._inertiaApplied = true;
+          gsap.killTweensOf(dot);
+          const pushX = dot.cx - pr.x + vx * 0.005;
+          const pushY = dot.cy - pr.y + vy * 0.005;
+          gsap.to(dot, {
+            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            onComplete: () => {
+              gsap.to(dot, {
+                xOffset: 0,
+                yOffset: 0,
+                duration: returnDuration,
+                ease: 'elastic.out(1,0.75)'
+              });
+              dot._inertiaApplied = false;
+            }
+          });
+        }
       }
-    }
-  };
+    };
 
-  const throttledMove = throttle(onMove, 50);
-  window.addEventListener('mousemove', throttledMove, { passive: true });
-  window.addEventListener('click', onClick);
+    const onClick = (e: MouseEvent) => {
+      const rect = canvasRef.current!.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      for (const dot of dotsRef.current) {
+        const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
+        if (dist < shockRadius && !dot._inertiaApplied) {
+          dot._inertiaApplied = true;
+          gsap.killTweensOf(dot);
+          const falloff = Math.max(0, 1 - dist / shockRadius);
+          const pushX = (dot.cx - cx) * shockStrength * falloff;
+          const pushY = (dot.cy - cy) * shockStrength * falloff;
+          gsap.to(dot, {
+            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            onComplete: () => {
+              gsap.to(dot, {
+                xOffset: 0,
+                yOffset: 0,
+                duration: returnDuration,
+                ease: 'elastic.out(1,0.75)'
+              });
+              dot._inertiaApplied = false;
+            }
+          });
+        }
+      }
+    };
 
-  return () => {
-    window.removeEventListener('mousemove', throttledMove);
-    window.removeEventListener('click', onClick);
-  };
-}, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
+    const throttledMove = throttle(onMove, 50);
+    window.addEventListener('mousemove', throttledMove, { passive: true });
+    window.addEventListener('click', onClick);
 
+    return () => {
+      window.removeEventListener('mousemove', throttledMove);
+      window.removeEventListener('click', onClick);
+    };
+  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
 
-
-  // Removed the <section> wrapper here for simplicity
   return (
-    <div ref={wrapperRef} className={className} style={{ position: 'relative', width: '100%', height: '100%', ...style }}>
-      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
-    </div>
+    <section className={`p-4 flex items-center justify-center h-full w-full relative ${className}`} style={style}>
+      <div ref={wrapperRef} className="w-full h-full relative">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+      </div>
+    </section>
   );
 };
 
-// Wrapped export in React.memo
-export default React.memo(DotGrid);
+export default DotGrid;
