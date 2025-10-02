@@ -1,6 +1,6 @@
 'use client'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { ChartBarIncreasingIcon, Database, Fingerprint, IdCard } from 'lucide-react'
+import { ChartBarIncreasingIcon,Fingerprint, IdCard } from 'lucide-react'
 import * as LucideIcons from 'lucide-react';
 import Image from 'next/image'
 import { useState } from 'react'

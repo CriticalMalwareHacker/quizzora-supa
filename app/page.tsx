@@ -6,7 +6,6 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { HeroHeader } from '@/components/header'
 import Features from '@/components/features-12'
-import DotGrid from '@/components/DotGrid'
 
 const transitionVariants = {
     item: {

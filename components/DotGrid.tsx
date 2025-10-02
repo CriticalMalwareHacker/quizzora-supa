@@ -6,16 +6,20 @@ import { InertiaPlugin } from 'gsap/InertiaPlugin';
 gsap.registerPlugin(InertiaPlugin);
 
 // throttle and hexToRgb functions remain the same...
-const throttle = (func: (...args: any[]) => void, limit: number) => {
+const throttle = <T extends unknown[]>(
+  func: (...args: T) => void,
+  limit: number
+): ((...args: T) => void) => {
   let lastCall = 0;
-  return function (this: any, ...args: any[]) {
+  return function (...args: T) {
     const now = performance.now();
     if (now - lastCall >= limit) {
       lastCall = now;
-      func.apply(this, args);
+      func(...args);
     }
   };
 };
+
 
 interface Dot {
   cx: number;
@@ -272,20 +276,20 @@ const DotGrid: React.FC<DotGridProps> = ({
     };
 
     const throttledMove = throttle(onMove, 50);
-    window.addEventListener('mousemove', throttledMove, { passive: true });
-    window.addEventListener('click', onClick);
+  window.addEventListener('mousemove', throttledMove, { passive: true });
+  window.addEventListener('click', onClick);
 
-    return () => {
-      window.removeEventListener('mousemove', throttledMove);
-      window.removeEventListener('click', onClick);
-    };
-  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
+  return () => {
+    window.removeEventListener('mousemove', throttledMove);
+    window.removeEventListener('click', onClick);
+  };
+}, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
 
 
   // Removed the <section> wrapper here for simplicity
   return (
-    <div ref={wrapperRef} className={`w-full h-full relative ${className}`} style={style}>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+    <div ref={wrapperRef} className={className} style={{ position: 'relative', width: '100%', height: '100%', ...style }}>
+      <canvas ref={canvasRef} style={{ display: 'block', width: '100%', height: '100%' }} />
     </div>
   );
 };
