@@ -2,9 +2,6 @@
 import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import Features from '@/components/features-12'
-import WallOfLoveSection from '@/components/testimonials'
-import Pricing from '@/components/pricing'
 
 const links = [
     {
