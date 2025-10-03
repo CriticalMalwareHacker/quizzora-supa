@@ -2,31 +2,22 @@
 import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import Features from '@/components/features-12'
+import WallOfLoveSection from '@/components/testimonials'
+import Pricing from '@/components/pricing'
 
 const links = [
     {
         title: 'Features',
-        href: '#',
-    },
-    {
-        title: 'Solution',
-        href: '#',
-    },
-    {
-        title: 'Customers',
-        href: '#',
+        href: '#Features',
     },
     {
         title: 'Pricing',
-        href: '#',
+        href: '#Pricing',
     },
     {
-        title: 'Help',
-        href: '#',
-    },
-    {
-        title: 'About',
-        href: '#',
+        title: 'Testimonials',
+        href: '#WallOfLoveSection',
     },
 ]
 
@@ -161,7 +152,7 @@ export default function FooterSection() {
                     </Link>
                 </div>
                 <div className="flex flex-row items-center justify-center gap-2">
-                <span className="text-muted-foreground block align-middletext-center text-sm"> © {new Date().getFullYear()} Tailark, All rights reserved</span>
+               <span className="text-muted-foreground block align-middletext-center text-sm"> © {new Date().getFullYear()} Quizzora, All rights reserved</span>
                 <ThemeSwitcher />
                 </div>
             </div>
