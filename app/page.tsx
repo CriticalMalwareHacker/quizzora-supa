@@ -6,6 +6,9 @@ import { TextEffect } from '@/components/ui/text-effect'
 import { AnimatedGroup } from '@/components/ui/animated-group'
 import { HeroHeader } from '@/components/header'
 import Features from '@/components/features-12'
+import WallOfLoveSection from '@/components/testimonials'
+import Pricing from '@/components/pricing'
+
 
 const transitionVariants = {
     item: {
@@ -141,6 +144,12 @@ export default function HeroSection() {
                 </section>
                <section id="Features">
                     <Features />
+                </section>
+                <section id="Pricing">
+                    <Pricing />
+                </section>
+                <section id="WallOfLoveSection">
+                    <WallOfLoveSection />
                 </section>
             </main>
         </>

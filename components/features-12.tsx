@@ -51,7 +51,7 @@ export default function Features() {
                                     AI creates quizzes, you save time
                                 </div>
                             </AccordionTrigger>
-                            <AccordionContent>Lyra is evolving to be more than just the models. It supports an entire to the APIs and platforms helping developers and businesses innovate.</AccordionContent>
+                            <AccordionContent>Turn any text or document into a quiz in seconds. No manual work — just quick, engaging quizzes for learning and events.</AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="item-2">
                             <AccordionTrigger>

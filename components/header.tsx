@@ -8,9 +8,8 @@ import { cn } from '@/lib/utils'
 
 const menuItems = [
     { name: 'Features', href: '#Features' },
-    { name: 'Solution', href: '#link' },
-    { name: 'Pricing', href: '#link' },
-    { name: 'About', href: '#link' },
+    { name: 'Pricing', href: '#Pricing' },
+    { name: 'Testimonials', href: '#WallOfLoveSection' },
 ]
 
 export const HeroHeader = () => {
