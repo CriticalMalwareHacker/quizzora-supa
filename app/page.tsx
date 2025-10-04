@@ -90,7 +90,7 @@ export default function HeroSection() {
                                             asChild
                                             size="lg"
                                             className="rounded-xl px-5 text-base">
-                                            <Link href="/auth/sign- up">
+                                            <Link href="/auth/sign-up">
                                                 <span className="text-nowrap">Make your first quiz!</span>
                                             </Link>
                                         </Button>

@@ -56,6 +56,21 @@ export function SignUpForm({
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const supabase = createClient();
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -105,6 +120,14 @@ export function SignUpForm({
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating an account..." : "Sign up"}
               </Button>
+              <Button
+                type="button"
+                className="w-full"
+                disabled={isLoading}
+                onClick={handleGoogleSignIn}
+              >
+                {isLoading ? "Redirecting..." : "Sign In with Google"}
+              </Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}
@@ -117,4 +140,4 @@ export function SignUpForm({
       </Card>
     </div>
   );
-}
+  }
