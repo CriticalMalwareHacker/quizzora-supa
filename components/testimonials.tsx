@@ -11,75 +11,75 @@ type Testimonial = {
 const testimonials: Testimonial[] = [
     {
         name: 'Jonathan Yombo',
-        role: 'Software Engineer',
+        role: 'Corporate Trainer',
         image: 'https://randomuser.me/api/portraits/men/1.jpg',
-        quote: 'Tailus is really extraordinary and very practical, no need to break your head. A real gold mine.',
+        quote: 'Quizzora is really extraordinary. The AI integration saves me hours on creating training materials. A real gold mine for educators!',
     },
     {
         name: 'Yves Kalume',
-        role: 'GDE - Android',
+        role: 'EdTech Influencer',
         image: 'https://randomuser.me/api/portraits/men/6.jpg',
-        quote: 'With no experience in webdesign I just redesigned my entire website in a few minutes with tailwindcss thanks to Tailus.',
+        quote: 'With no experience in instructional design, I just created an entire interactive course assessment in a few minutes thanks to Quizzora.',
     },
     {
         name: 'Yucel Faruksahan',
-        role: 'Tailkits Creator',
+        role: 'Curriculum Developer',
         image: 'https://randomuser.me/api/portraits/men/7.jpg',
-        quote: 'Great work on tailfolio template. This is one of the best personal website that I have seen so far :)',
+        quote: 'Great work on Quizzora. This is one of the best AI quiz makers that I have seen so far. So intuitive and powerful.',
     },
     {
         name: 'Anonymous author',
-        role: 'Doing something',
+        role: 'High School Teacher',
         image: 'https://randomuser.me/api/portraits/men/8.jpg',
-        quote: 'I am really new to Tailwind and I want to give a go to make some page on my own. I searched a lot of hero pages and blocks online. However, most of them are not giving me a clear view or needed some HTML/CSS coding background to make some changes from the original or too expensive to have. I downloaded the one of Tailus template which is very clear to understand at the start and you could modify the codes/blocks to fit perfectly on your purpose of the page.',
+        quote: "I am really new to making online quizzes and wanted to create some for my class. Quizzora was the only one that was clear from the start. The AI helps generate questions and I could modify them to fit my lesson plan perfectly.",
     },
     {
         name: 'Shekinah Tshiokufila',
         role: 'Senior Software Engineer',
         image: 'https://randomuser.me/api/portraits/men/4.jpg',
-        quote: 'Tailus is redefining the standard of web design, with these blocks it provides an easy and efficient way for those who love beauty but may lack the time to implement it. I can only recommend this incredible wonder.',
+        quote: 'Quizzora is redefining the standard for online assessments. Its AI provides an easy and efficient way for those who love creating interactive content but may lack the time. I can only recommend this incredible wonder.',
     },
     {
         name: 'Oketa Fred',
         role: 'Fullstack Developer',
         image: 'https://randomuser.me/api/portraits/men/2.jpg',
-        quote: 'I absolutely love Tailus! The component blocks are beautifully designed and easy to use, which makes creating a great-looking website a breeze.',
+        quote: 'I absolutely love Quizzora! The AI-generated questions are incredibly accurate and the platform is easy to use, which makes creating a great-looking quiz a breeze.',
     },
     {
         name: 'Zeki',
-        role: 'Founder of ChatExtend',
+        role: 'Founder of StudyApp',
         image: 'https://randomuser.me/api/portraits/men/5.jpg',
-        quote: "Using TailsUI has been like unlocking a secret design superpower. It's the perfect fusion of simplicity and versatility, enabling us to create UIs that are as stunning as they are user-friendly.",
+        quote: "Using Quizzora has been like unlocking a secret teaching superpower. It's the perfect fusion of AI simplicity and pedagogical versatility.",
     },
     {
         name: 'Joseph Kitheka',
-        role: 'Fullstack Developer',
+        role: 'Online Course Creator',
         image: 'https://randomuser.me/api/portraits/men/9.jpg',
-        quote: 'Tailus has transformed the way I develop web applications. Their extensive collection of UI components, blocks, and templates has significantly accelerated my workflow. The flexibility to customize every aspect allows me to create unique user experiences. Tailus is a game-changer for modern web development!',
+        quote: 'Quizzora has transformed the way I build my courses. Its AI-powered question generation has significantly accelerated my workflow, allowing me to create unique learning experiences.',
     },
     {
         name: 'Khatab Wedaa',
-        role: 'MerakiUI Creator',
+        role: 'UI/UX Designer',
         image: 'https://randomuser.me/api/portraits/men/10.jpg',
-        quote: "Tailus is an elegant, clean, and responsive tailwind css components it's very helpful to start fast with your project.",
+        quote: "Quizzora is an elegant, clean, and responsive AI quiz maker. It's very helpful to get started fast on any educational project.",
     },
     {
         name: 'Rodrigo Aguilar',
-        role: 'TailwindAwesome Creator',
+        role: 'Bootcamp Instructor',
         image: 'https://randomuser.me/api/portraits/men/11.jpg',
-        quote: 'I love Tailus ❤️. The component blocks are well-structured, simple to use, and beautifully designed. It makes it really easy to have a good-looking website in no time.',
+        quote: 'I love Quizzora ❤️. The AI-generated question blocks are well-structured, simple to use, and intelligently designed. It makes it really easy to have an effective quiz in no time.',
     },
     {
         name: 'Eric Ampire',
-        role: 'Mobile Engineer at @BRPNews • @GoogleDevExpert for Android',
+        role: 'Google Developer Expert',
         image: 'https://randomuser.me/api/portraits/men/12.jpg',
-        quote: 'Tailus templates are the perfect solution for anyone who wants to create a beautiful and functional website without any web design experience. The templates are easy to use, customizable, and responsive, and the support team is always available to help. I highly recommend Tailus templates to anyone who is looking to create a website.',
+        quote: 'Quizzora is the perfect solution for anyone who wants to create a beautiful and functional quiz without any design experience. The AI assistance is easy to use and the results are fantastic.',
     },
     {
         name: 'Roland Tubonge',
         role: 'Software Engineer',
         image: 'https://randomuser.me/api/portraits/men/13.jpg',
-        quote: 'Tailus is so well designed that even with a very poor knowledge of web design you can do miracles. Let yourself be seduced!',
+        quote: "Quizzora is so well designed that even with very little knowledge of a subject, the AI can help you create miracles. Let yourself be seduced by effortless quiz creation!",
     },
 ]
 
@@ -99,8 +99,8 @@ export default function WallOfLoveSection() {
             <div className="py-16 md:py-32">
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="text-center">
-                        <h2 className="text-3xl font-semibold">Loved by the Community</h2>
-                        <p className="mt-6">Harum quae dolore orrupti aut temporibus ariatur.</p>
+                        <h2 className="text-3xl font-semibold">Loved by Educators and Creators</h2>
+                        <p className="mt-6 text-muted-foreground">See what people are saying about Quizzora's AI-powered quiz creation.</p>
                     </div>
                     <div className="mt-8 grid gap-3 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
                         {testimonialChunks.map((chunk, chunkIndex) => (
@@ -118,7 +118,7 @@ export default function WallOfLoveSection() {
                                                     width="120"
                                                     height="120"
                                                 />
-                                                <AvatarFallback>ST</AvatarFallback>
+                                                <AvatarFallback>{name.substring(0, 2).toUpperCase()}</AvatarFallback>
                                             </Avatar>
 
                                             <div>
