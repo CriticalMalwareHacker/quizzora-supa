@@ -100,7 +100,8 @@ export default function WallOfLoveSection() {
                 <div className="mx-auto max-w-6xl px-6">
                     <div className="text-center">
                         <h2 className="text-3xl font-semibold">Loved by Educators and Creators</h2>
-                        <p className="mt-6 text-muted-foreground">See what people are saying about Quizzora's AI-powered quiz creation.</p>
+                        {/* THIS IS THE FIXED LINE */}
+                        <p className="mt-6 text-muted-foreground">See what people are saying about Quizzora&apos;s AI-powered quiz creation.</p>
                     </div>
                     <div className="mt-8 grid gap-3 sm:grid-cols-2 md:mt-12 lg:grid-cols-3">
                         {testimonialChunks.map((chunk, chunkIndex) => (
