@@ -5,10 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 // FIX: Update Quiz type import path
-import { type Quiz } from "../../quiz-list"; 
+import { type Quiz } from "../../quiz-list";
 
 // FIX: Import the client component from its new co-located file
-import { EditForm } from "./edit-form"; 
+import { EditForm } from "./edit-form";
 
 // Fetch data for a single quiz
 async function getQuiz(id: string) {
@@ -33,11 +33,12 @@ async function getQuiz(id: string) {
   return quiz as Quiz;
 }
 
-export default async function EditQuizPage({
-  params,
-}: {
+// FIX: Changed function signature to accept `props`
+export default async function EditQuizPage(props: {
   params: { id: string };
 }) {
+  // FIX: Await props and destructure params here
+  const { params } = await props;
   const quiz = await getQuiz(params.id);
 
   if (!quiz) {
