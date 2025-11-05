@@ -12,7 +12,7 @@ import { ArrowLeft, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 
 // FIX: Corrected the import path from ../ to ../../
-import { type Quiz } from "../../quiz-list"; 
+import { type Quiz } from "../../quiz-list";
 import { cn } from "@/lib/utils";
 
 // Fetch data for a single quiz
@@ -38,11 +38,12 @@ async function getQuiz(id: string) {
   return quiz as Quiz;
 }
 
-export default async function ViewQuizPage({
-  params,
-}: {
+// FIX: Changed function signature to accept `props` instead of destructuring `params`
+export default async function ViewQuizPage(props: {
   params: { id: string };
 }) {
+  // FIX: Await the props here to resolve the dynamic params
+  const { params } = await props;
   const quiz = await getQuiz(params.id);
 
   if (!quiz) {

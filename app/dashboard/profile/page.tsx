@@ -2,10 +2,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
+import { type User } from "@supabase/supabase-js";
 import { UpdateProfileForm } from "@/components/update-profile-form"; // We will create this
 
 // Helper function to get the display name
-function getDisplayName(user: any) {
+function getDisplayName(user: User) {
   return user.user_metadata?.username || user.user_metadata?.full_name || user.email;
 }
 
