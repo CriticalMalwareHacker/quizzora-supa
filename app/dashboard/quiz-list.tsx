@@ -5,17 +5,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
+// Import 3D Card components
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  CardContainer,
+  CardBody,
+  CardItem,
+} from "@/components/ui/3d-card";
+
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-// Updated icons
 import { FileText, Eye, Edit, Trash2 } from "lucide-react";
 import {
   AlertDialog,
@@ -27,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"; // Make sure to create this component or install it
+} from "@/components/ui/alert-dialog";
 
 // Define the types for the quiz data from Supabase
 type Option = { id: string; text: string };
@@ -99,68 +97,101 @@ export function QuizList({ quizzes }: QuizListProps) {
     <AlertDialog>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {currentQuizzes.map((quiz) => (
-          <Card key={quiz.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle>{quiz.title || "Untitled Quiz"}</CardTitle>
-              <CardDescription>
-                Created on: {formatDate(quiz.created_at)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="flex items-center text-muted-foreground">
-                <FileText className="h-4 w-4 mr-2" />
-                <span>
-                  {quiz.questions ? quiz.questions.length : 0} questions
-                </span>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between gap-2">
-              <Button variant="outline" size="sm" asChild>
-                {/* UPDATED: "View" button */}
-                <Link href={`/dashboard/view/${quiz.id}`}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  View
-                </Link>
-              </Button>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" asChild>
-                  {/* UPDATED: Link to edit page */}
-                  <Link href={`/dashboard/edit/${quiz.id}`}>
-                    <Edit className="h-4 w-4" />
-                  </Link>
-                </Button>
+          // 1. Replaced <Card> with <CardContainer>
+          <CardContainer key={quiz.id} className="inter-var">
+            {/* 2. Replaced CardHeader/Content/Footer with <CardBody> */}
+            <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-auto rounded-xl p-6 border flex flex-col">
+              {/* 3. Replaced <CardTitle> with <CardItem> */}
+              <CardItem
+                translateZ="50"
+                className="text-xl font-bold text-neutral-600 dark:text-white"
+              >
+                {quiz.title || "Untitled Quiz"}
+              </CardItem>
 
-                {/* UPDATED: Delete Button with Confirmation */}
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      your quiz &quot;{quiz.title || "Untitled Quiz"}&quot;.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDelete(quiz.id)}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
+              {/* 4. Replaced <CardDescription> with <CardItem> */}
+              <CardItem
+                as="p"
+                translateZ="60"
+                className="text-neutral-500 text-sm max-w-sm mt-2 dark:text-neutral-300"
+              >
+                Created on: {formatDate(quiz.created_at)}
+              </CardItem>
+
+              {/* 5. Replaced <CardContent> with <CardItem> */}
+              {/* Added flex-grow to push footer to bottom */}
+              <div className="flex-grow mt-6">
+                <CardItem
+                  translateZ="40"
+                  className="flex items-center text-muted-foreground"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  <span>
+                    {quiz.questions ? quiz.questions.length : 0} questions
+                  </span>
+                </CardItem>
               </div>
-            </CardFooter>
-          </Card>
+
+              {/* 6. Replaced <CardFooter> with a div and <CardItem> for buttons */}
+              <div className="flex justify-between items-center mt-8">
+                <CardItem
+                  translateZ={20}
+                  asChild // Use asChild to pass props to Button/Link
+                >
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/dashboard/view/${quiz.id}`}>
+                      <Eye className="h-4 w-4 mr-2" />
+                      View
+                    </Link>
+                  </Button>
+                </CardItem>
+
+                <div className="flex gap-2">
+                  <CardItem translateZ={20} asChild>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/dashboard/edit/${quiz.id}`}>
+                        <Edit className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </CardItem>
+
+                  <CardItem translateZ={20} asChild>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                  </CardItem>
+                </div>
+              </div>
+            </CardBody>
+
+            {/* This is the modal content. It's kept as a sibling to CardBody 
+              so it doesn't get warped by the 3D transform.
+            */}
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your quiz &quot;{quiz.title || "Untitled Quiz"}&quot;.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => handleDelete(quiz.id)}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </CardContainer>
         ))}
       </div>
     </AlertDialog>
