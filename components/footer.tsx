@@ -6,15 +6,19 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 const links = [
     {
         title: 'Features',
-        href: '#Features',
+        href: '/#Features', // ✅ Changed
     },
     {
         title: 'Pricing',
-        href: '#Pricing',
+        href: '/#Pricing', // ✅ Changed
     },
     {
         title: 'Testimonials',
-        href: '#WallOfLoveSection',
+        href: '/#WallOfLoveSection', // ✅ Changed
+    },
+    {
+        title: 'Marketplace',
+        href: '/marketplace', // ✅ Added
     },
 ]
 
