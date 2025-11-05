@@ -1,6 +1,4 @@
-import { EnvVarWarning } from "@/components/env-var-warning";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
-import { hasEnvVars } from "@/lib/utils";
 import { IconHome, IconSettings, IconUser, IconLogout } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button"; // ✅ add this import
 
