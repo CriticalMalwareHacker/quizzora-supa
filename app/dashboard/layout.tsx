@@ -15,7 +15,7 @@ const sidebarLinks = [
   },
   {
     label: "Profile",
-    href: "/profile",
+    href: "/dashboard/profile",
     icon: <IconUser className="h-5 w-5" />,
   },
   {
