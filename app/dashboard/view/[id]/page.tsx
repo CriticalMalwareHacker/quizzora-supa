@@ -1,3 +1,4 @@
+// app/dashboard/view/[id]/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import {
@@ -11,11 +12,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 
-// FIX: Corrected the import path from ../ to ../../
+// corrected import path
 import { type Quiz } from "../../quiz-list";
 import { cn } from "@/lib/utils";
 
-// Fetch data for a single quiz
 async function getQuiz(id: string) {
   const supabase = await createClient();
 
@@ -28,7 +28,7 @@ async function getQuiz(id: string) {
     .from("quizzes")
     .select()
     .eq("id", id)
-    .eq("user_id", authData.user.id) // RLS handles this, but good for explicit check
+    .eq("user_id", authData.user.id)
     .single();
 
   if (quizError || !quiz) {
@@ -38,13 +38,14 @@ async function getQuiz(id: string) {
   return quiz as Quiz;
 }
 
-// FIX: Changed function signature to accept `props` instead of destructuring `params`
-export default async function ViewQuizPage(props: {
-  params: { id: string };
+// ✅ For Next 15+: params is a Promise
+export default async function ViewQuizPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
 }) {
-  // FIX: Await the props here to resolve the dynamic params
-  const { params } = await props;
-  const quiz = await getQuiz(params.id);
+  const { id } = await params; // await the params Promise
+  const quiz = await getQuiz(id);
 
   if (!quiz) {
     return (
