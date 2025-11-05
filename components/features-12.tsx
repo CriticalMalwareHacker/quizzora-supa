@@ -35,7 +35,7 @@ export default function Features() {
             <div className="mx-auto max-w-5xl space-y-8 px-6 md:space-y-16 lg:space-y-20 dark:[--color-border:color-mix(in_oklab,var(--color-white)_10%,transparent)]">
                 <div className="relative z-10 mx-auto max-w-2xl space-y-6 text-center">
                     <h2 className="text-balance text-4xl font-semibold lg:text-6xl">Not your average quiz site</h2>
-                    <p>Engage your audience with interactive quizzes.</p>
+                    <p>Engage your audience with cool interactive quizzes.</p>
                 </div>
 
                 <div className="grid gap-12 sm:px-12 md:grid-cols-2 lg:gap-20 lg:px-0">
