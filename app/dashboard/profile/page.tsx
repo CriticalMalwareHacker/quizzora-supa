@@ -2,7 +2,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { UpdateProfileForm } from "@/components/update-profile-form"; // We will create this
 
 // Helper function to get the display name
