@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
-
 import { createClient } from "@/lib/supabase/server";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { PlusCircle } from "lucide-react";
+
 export default async function ProtectedPage() {
   const supabase = await createClient();
 
@@ -10,8 +13,21 @@ export default async function ProtectedPage() {
   }
 
   return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="font-bold text-2xl">Dashboard</h2>
+        <Button asChild>
+          {/* --- THIS LINK IS UPDATED --- */}
+          <Link href="/create-quiz">
+            <PlusCircle className="mr-2 h-4 w-4" /> Create Quiz
+          </Link>
+        </Button>
+      </div>
 
-    <h2 className="font-bold text-2xl mb-4">lorem ipsum</h2>
-
+      <div className="border rounded-lg p-8 text-center text-muted-foreground">
+        <p>Your existing quizzes will be listed here.</p>
+        <p className="text-sm">Start by creating a new quiz!</p>
+      </div>
+    </div>
   );
 }
