@@ -10,7 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
-import { type Quiz } from "../quiz-list"; // Import the type
+
+// FIX: Corrected the import path from ../ to ../../
+import { type Quiz } from "../../quiz-list"; 
 import { cn } from "@/lib/utils";
 
 // Fetch data for a single quiz
