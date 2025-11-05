@@ -9,7 +9,6 @@ import Features from '@/components/features-12'
 import WallOfLoveSection from '@/components/testimonials'
 import Pricing from '@/components/pricing'
 
-
 const transitionVariants = {
     item: {
         hidden: {
@@ -42,9 +41,9 @@ export default function HeroSection() {
                     <div className="h-320 absolute left-0 top-0 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
                     <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
                 </div>
+
                 <section>
                     <div className="relative pt-24 md:pt-36">
-
                         <div
                             aria-hidden
                             className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"
@@ -52,7 +51,6 @@ export default function HeroSection() {
 
                         <div className="mx-auto max-w-7xl px-6">
                             <div className="text-center sm:mx-auto lg:mr-auto lg:mt-0">
-
                                 <TextEffect
                                     preset="fade-in-blur"
                                     speedSegment={0.3}
@@ -60,6 +58,7 @@ export default function HeroSection() {
                                     className="mx-auto mt-8 max-w-4xl text-balance text-5xl max-md:font-semibold md:text-7xl lg:mt-16 xl:text-[5.25rem]">
                                     Quizzora - Your Quiz Maker
                                 </TextEffect>
+
                                 <TextEffect
                                     per="line"
                                     preset="fade-in-blur"
@@ -70,6 +69,7 @@ export default function HeroSection() {
                                     Create, share, and play quizzes in minutes. Quizzora makes learning and fun come together seamlessly.
                                 </TextEffect>
 
+                                {/* ✅ Rectangular Buttons */}
                                 <AnimatedGroup
                                     variants={{
                                         container: {
@@ -82,33 +82,32 @@ export default function HeroSection() {
                                         },
                                         ...transitionVariants,
                                     }}
-                                    className="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-                                    <div
-                                        key={1}
-                                        className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5">
-                                        <Button
-                                            asChild
-                                            size="lg"
-                                            className="rounded-xl px-5 text-base">
-                                            <Link href="/auth/sign-up">
-                                                <span className="text-nowrap">Make your first quiz!</span>
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                    className="mt-12 flex flex-col items-center justify-center gap-3 md:flex-row md:gap-4"
+                                >
+                                    {/* White Button (Sign Up Style) */}
                                     <Button
-                                        key={2}
                                         asChild
                                         size="lg"
-                                        variant="ghost"
-                                        className="h-10.5 rounded-xl px-5">
-                                        <Link href="#link">
-                                            <span className="text-nowrap">Request a demo</span>
+                                        className="rounded-md px-6 py-2.5 text-base font-semibold bg-white text-black border border-gray-300 hover:bg-gray-100 transition-all duration-200 shadow-sm">
+                                        <Link href="/auth/sign-up">
+                                            Make your first quiz!
+                                        </Link>
+                                    </Button>
+
+                                    {/* Black Button (Login Style) */}
+                                    <Button
+                                        asChild
+                                        size="lg"
+                                        className="rounded-md px-6 py-2.5 text-base font-semibold bg-black text-white border border-black hover:bg-gray-900 transition-all duration-200 shadow-sm">
+                                        <Link href="#demo">
+                                            Request a demo
                                         </Link>
                                     </Button>
                                 </AnimatedGroup>
                             </div>
                         </div>
 
+                        {/* ✅ Updated Hero Image Section - Fills Fully, No Black Border */}
                         <AnimatedGroup
                             variants={{
                                 container: {
@@ -120,34 +119,31 @@ export default function HeroSection() {
                                     },
                                 },
                                 ...transitionVariants,
-                            }}>
-                            <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-                                <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
+                            }}
+                        >
+                            <div className="relative mt-10 overflow-hidden px-2 sm:mt-16 md:mt-20">
+                                <div className="mx-auto max-w-6xl overflow-hidden rounded-xl">
                                     <Image
-                                        className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
                                         src="/quizhero.jpg"
                                         alt="app screen"
-                                        width="2700"
-                                        height="1440"
-                                    />
-                                    <Image
-                                        className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-                                        src="/quizhero.jpg"
-                                        alt="app screen"
-                                        width="2700"
-                                        height="1440"
+                                        width={2700}
+                                        height={1440}
+                                        className="w-full h-auto object-cover"
                                     />
                                 </div>
                             </div>
                         </AnimatedGroup>
                     </div>
                 </section>
-               <section id="Features">
+
+                <section id="Features">
                     <Features />
                 </section>
+
                 <section id="Pricing">
                     <Pricing />
                 </section>
+
                 <section id="WallOfLoveSection">
                     <WallOfLoveSection />
                 </section>
