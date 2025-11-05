@@ -1,16 +1,12 @@
+// app/dashboard/edit/[id]/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-
-// FIX: Update Quiz type import path
 import { type Quiz } from "../../quiz-list";
-
-// FIX: Import the client component from its new co-located file
 import { EditForm } from "./edit-form";
 
-// Fetch data for a single quiz
 async function getQuiz(id: string) {
   const supabase = await createClient();
 
@@ -26,20 +22,18 @@ async function getQuiz(id: string) {
     .eq("user_id", authData.user.id)
     .single();
 
-  if (quizError || !quiz) {
-    return null;
-  }
-
+  if (quizError || !quiz) return null;
   return quiz as Quiz;
 }
 
-// FIX: Changed function signature to accept `props`
-export default async function EditQuizPage(props: {
-  params: { id: string };
+// ✅ Next 15+ : params is a Promise
+export default async function EditQuizPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
 }) {
-  // FIX: Await props and destructure params here
-  const { params } = await props;
-  const quiz = await getQuiz(params.id);
+  const { id } = await params;     // ✅ await the params promise
+  const quiz = await getQuiz(id);
 
   if (!quiz) {
     return (
@@ -58,6 +52,5 @@ export default async function EditQuizPage(props: {
     );
   }
 
-  // Pass the server-fetched quiz data to the client component form
   return <EditForm quiz={quiz} />;
 }
