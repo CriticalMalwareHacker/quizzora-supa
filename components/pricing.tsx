@@ -11,7 +11,7 @@ export default function Pricing() {
                         Pricing that Scales with You
                     </h1>
                     <p>
-                        Choose a plan that fits your learning goals. Whether you're a student testing the waters or
+                        Choose a plan that fits your learning goals. Whether you&apos;re a student testing the waters or
                         an educator managing advanced quiz analytics, our pricing adapts to your needs.
                     </p>
                 </div>
