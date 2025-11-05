@@ -23,9 +23,8 @@ export default async function ProfilePage() {
     redirect("/auth/login");
   }
 
-  // ✅ Extract user's dynamic data
-  const displayName = getDisplayName(user);
-  const email = user.email || "No email provided";
+  // ✅ Extract user's dynamic data 
+  const email = user.email || "No email provided";  
   const avatarUrl =
     user.user_metadata?.avatar_url ||
     "https://raw.githubusercontent.com/Loopple/loopple-public-assets/main/riva-dashboard-tailwind/img/avatars/avatar1.jpg"; // Fallback avatar
@@ -34,7 +33,7 @@ export default async function ProfilePage() {
   return (
     <div className="flex flex-col gap-8">
       {/* ✅ Removed the "Welcome" H1 to make the page cleaner, as the name is in the card */}
-      
+      <h1 className="text-3xl font-bold">Welcome, {getDisplayName(user)}!</h1>
       {/* Your Profile Card Template */}
       <div className="relative flex flex-col w-full min-w-0 break-words border border-dashed bg-clip-border rounded-2xl border-stone-200 bg-light/30 dark:bg-neutral-800/30">
         {/* Card Body */}
