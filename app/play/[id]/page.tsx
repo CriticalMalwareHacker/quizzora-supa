@@ -38,12 +38,14 @@ async function getPlayerQuiz(id: string) {
   return { ...quiz, questions: playerQuestions } as Quiz;
 }
 
+// ✅ FIX: accept params as a Promise and await it (Next 15+ / App Router)
 export default async function PlayQuizPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const quiz = await getPlayerQuiz(params.id);
+  const { id } = await params;
+  const quiz = await getPlayerQuiz(id);
 
   if (!quiz) {
     notFound();
