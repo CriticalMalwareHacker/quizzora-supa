@@ -11,11 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, CheckCircle, Circle, Upload } from "lucide-react";
+// 1. FIX: Removed unused 'Upload' icon
+import { Plus, Trash2, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+// 3. FIX: Import next/image
+import Image from "next/image";
 
 // FIX: Update import path to go up two levels
 import { type Quiz } from "../../quiz-list";
@@ -39,7 +42,8 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
 
   // ✅ Add state for cover image
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(
+  // 2. FIX: Prefixed unused setter with an underscore
+  const [coverImageUrl, _setCoverImageUrl] = useState<string | null>(
     quiz.cover_image_url,
   );
   const [newCoverImageFile, setNewCoverImageFile] = useState<File | null>(
@@ -243,11 +247,12 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
           />
           {coverImagePreview && (
             <div className="mt-4 relative w-full h-48">
-              {/* Use a plain <img> for preview to avoid next/image / DOM Image conflicts */}
-              <img
+              {/* 3. FIX: Replaced <img> with next/Image */}
+              <Image
                 src={coverImagePreview}
                 alt="Cover image preview"
-                className="rounded-md object-cover w-full h-full"
+                fill
+                className="rounded-md object-cover"
               />
             </div>
           )}

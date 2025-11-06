@@ -190,7 +190,7 @@ export function QuizList({ quizzes }: QuizListProps) {
                   This action cannot be undone. This will permanently delete your
                   quiz{" "}
                   <span className="font-medium">
-                    "{quiz.title || "Untitled Quiz"}"
+                    &ldquo;{quiz.title || "Untitled Quiz"}&rdquo;
                   </span>
                   .
                 </AlertDialogDescription>
