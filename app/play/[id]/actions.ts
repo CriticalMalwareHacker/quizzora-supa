@@ -37,6 +37,12 @@ export async function submitQuiz(
 
   const total = questions.length;
 
-  // 3. Redirect to the results page
-  redirect(`/play/${quizId}/results?score=${score}&total=${total}`);
+  // ✅ NEW: Serialize the answers Map to pass in the URL
+  const answersString = JSON.stringify(Array.from(answers.entries()));
+  const encodedAnswers = encodeURIComponent(answersString);
+
+  // 3. Redirect to the results page with score, total, and answers
+  redirect(
+    `/play/${quizId}/results?score=${score}&total=${total}&answers=${encodedAnswers}`,
+  );
 }

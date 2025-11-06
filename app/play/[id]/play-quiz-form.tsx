@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Image from "next/image"; // ✅ IMPORT IMAGE
+import Image from "next/image";
 
 export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(
@@ -53,7 +53,8 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      // ✅ FIX: Changed from + 1 to - 1
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
@@ -86,7 +87,6 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     <AlertDialog>
       <form onSubmit={handleSubmit}>
         <Card>
-          {/* ✅ MODIFIED CardHeader */}
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -110,7 +110,6 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
               </AlertDialogTrigger>
             </div>
 
-            {/* ✅ NEW: Display image if it exists */}
             {currentQuestion.image_url && (
               <div className="relative w-full h-48 mt-4">
                 <Image
@@ -121,7 +120,6 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
                 />
               </div>
             )}
-            {/* -------------------------------- */}
           </CardHeader>
           <CardContent className="space-y-3">
             {currentQuestion.options.map((opt) => {
