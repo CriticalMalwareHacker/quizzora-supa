@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-import FooterSection from "@/components/footer";
+// import FooterSection from "@/components/footer"; // <-- 1. REMOVED IMPORT
 import DotGrid from "@/components/DotGrid";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -45,8 +45,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <FooterSection />
-        </ThemeProvider>  
+          {/* <FooterSection /> <-- 2. REMOVED COMPONENT */}
+        </ThemeProvider>
       </body>
     </html>
   );

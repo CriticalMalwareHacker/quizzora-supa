@@ -20,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { HeroHeader } from "@/components/header";
 import Link from "next/link";
+import FooterSection from "@/components/footer"; // <-- 1. IMPORTED FOOTER
 
 // Mock data for the marketplace quizzes
 const marketplaceQuizzes = [
@@ -195,6 +196,7 @@ export default function PublicMarketplacePage() {
           </div>
         </div>
       </main>
+      <FooterSection /> {/* <-- 2. ADDED FOOTER COMPONENT */}
     </>
   );
 }
