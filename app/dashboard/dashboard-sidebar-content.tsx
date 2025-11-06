@@ -8,6 +8,7 @@ import {
   IconUsersGroup,
   IconPlayerPlay,
   IconHexagonLetterQ, // Using this as the icon for the logo
+  IconChartBar, // ✅ 1. Import the missing icon
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
 import { Logo } from "@/components/logo";
@@ -21,6 +22,12 @@ const sidebarLinks = [
     label: "Dashboard",
     href: "/dashboard",
     icon: <IconHome className="h-5 w-5" />,
+  },
+  // ✅ 2. Added the "Statistics" link
+  {
+    label: "Statistics",
+    href: "/dashboard/stats",
+    icon: <IconChartBar className="h-5 w-5" />,
   },
   {
     label: "Profile",
@@ -39,7 +46,7 @@ const sidebarLinks = [
   },
   {
     label: "Settings",
-    href: "/settings",
+    href: "/dashboard/settings", // ✅ 3. Corrected the path
     icon: <IconSettings className="h-5 w-5" />,
   },
 ];
@@ -59,13 +66,17 @@ export function DashboardSidebarContent() {
             href="/dashboard"
             className={cn(
               "flex items-center gap-2 group/sidebar py-2",
-              !open && "justify-center" // Center icon when closed
+              !open && "justify-center", // Center icon when closed
             )}
           >
             {/* Full Logo (when open) */}
             <motion.div
               animate={{
-                display: animate ? (open ? "inline-block" : "none") : "inline-block",
+                display: animate
+                  ? open
+                    ? "inline-block"
+                    : "none"
+                  : "inline-block",
                 opacity: animate ? (open ? 1 : 0) : 1,
               }}
               className="whitespace-pre"
@@ -80,7 +91,7 @@ export function DashboardSidebarContent() {
               }}
               className={cn(
                 "text-neutral-700 dark:text-neutral-200",
-                !open && "flex items-center justify-center w-full"
+                !open && "flex items-center justify-center w-full",
               )}
             >
               {/* Using a placeholder 'Q' icon as the logo file is text */}

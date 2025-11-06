@@ -98,9 +98,12 @@ export function QuizList({ quizzes }: QuizListProps) {
     <div className="grid gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
       {currentQuizzes.map((quiz) => (
         <AlertDialog key={quiz.id}>
-          <CardContainer className="inter-var">
-            {/* Card Body with 3D Card components */}
-            <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-auto rounded-xl p-6 border flex flex-col">
+          {/* ✅ 1. Remove the container's default padding */}
+          <CardContainer className="inter-var" containerClassName="p-0">
+            {/* ✅ 2. Make CardBody responsive, full-height, and a flex column */}
+            <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-full rounded-xl p-6 border flex flex-col">
+              
+              {/* --- Header Section --- */}
               <CardItem
                 translateZ="50"
                 className="text-xl font-bold text-neutral-600 dark:text-white"
@@ -116,21 +119,25 @@ export function QuizList({ quizzes }: QuizListProps) {
                 Created on: {formatDate(quiz.created_at)}
               </CardItem>
 
-              {/* Cover image (new) */}
-              <CardItem translateZ="100" className="w-full mt-4 h-40 relative">
-                <Image
-                  src={quiz.cover_image_url || "/quizhero.jpg"}
-                  alt={quiz.title || "Quiz cover image"}
-                  fill
-                  className="object-cover rounded-xl group-hover/card:shadow-xl"
-                />
-              </CardItem>
+              {/* ✅ 3. Add flex-grow to this wrapper to push the footer down */}
+              <div className="flex-grow">
+                {/* Cover image (new) */}
+                <CardItem
+                  translateZ="100"
+                  className="w-full mt-4 h-40 relative"
+                >
+                  <Image
+                    src={quiz.cover_image_url || "/quizhero.jpg"}
+                    alt={quiz.title || "Quiz cover image"}
+                    fill
+                    className="object-cover rounded-xl group-hover/card:shadow-xl"
+                  />
+                </CardItem>
 
-              {/* Content showing number of questions */}
-              <div className="flex-grow mt-6">
+                {/* Content showing number of questions */}
                 <CardItem
                   translateZ="40"
-                  className="flex items-center text-muted-foreground"
+                  className="flex items-center text-muted-foreground mt-4"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   <span>
@@ -138,6 +145,8 @@ export function QuizList({ quizzes }: QuizListProps) {
                   </span>
                 </CardItem>
               </div>
+
+              {/* ✅ 4. Removed the redundant flex-grow div here */}
 
               {/* Footer actions */}
               <div className="flex justify-between items-center mt-8">
