@@ -8,6 +8,7 @@ import { HeroHeader } from '@/components/header'
 import Features from '@/components/features-12'
 import WallOfLoveSection from '@/components/testimonials'
 import Pricing from '@/components/pricing'
+import FooterSection from '@/components/footer' // <-- 1. IMPORTED FOOTER
 
 const transitionVariants = {
     item: {
@@ -148,6 +149,7 @@ export default function HeroSection() {
                     <WallOfLoveSection />
                 </section>
             </main>
+            <FooterSection /> {/* <-- 2. ADDED FOOTER COMPONENT */}
         </>
     )
 }

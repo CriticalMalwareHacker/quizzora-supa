@@ -14,11 +14,21 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+// ✅ --- New Imports ---
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+// --------------------
 
 export function UpdateProfileForm({ user }: { user: User }) {
   const supabase = createClient();
+  const router = useRouter(); // ✅ Initialize router
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  
+  // ✅ Changed message state to hold type and content
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    content: string;
+  } | null>(null);
 
   // Initialize state with user's current metadata
   const [fullName, setFullName] = useState<string>(
@@ -27,7 +37,6 @@ export function UpdateProfileForm({ user }: { user: User }) {
   const [username, setUsername] = useState<string>(
     user.user_metadata.username || "",
   );
-  // ✅ Added location state
   const [location, setLocation] = useState<string>(
     user.user_metadata.location || "",
   );
@@ -37,22 +46,21 @@ export function UpdateProfileForm({ user }: { user: User }) {
     setLoading(true);
     setMessage(null);
 
-    // ✅ Update logic now includes location
     const { error } = await supabase.auth.updateUser({
       data: {
         full_name: fullName,
         username: username,
-        location: location, // ✅ Save location
+        location: location,
       },
     });
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      // ✅ Set specific error message
+      setMessage({ type: "error", content: `Error: ${error.message}` });
     } else {
-      setMessage("Profile updated successfully!");
-      // ✅ Refresh the page to show the new data in the card above
-      // You can also use router.refresh() if you prefer
-      window.location.reload();
+      // ✅ Set success message and refresh server data
+      setMessage({ type: "success", content: "Profile updated successfully!" });
+      router.refresh();
     }
 
     setLoading(false);
@@ -92,7 +100,6 @@ export function UpdateProfileForm({ user }: { user: User }) {
               placeholder="A public @username"
             />
           </div>
-          {/* ✅ Added Location input field */}
           <div className="grid gap-2">
             <Label htmlFor="location">Location</Label>
             <Input
@@ -104,12 +111,25 @@ export function UpdateProfileForm({ user }: { user: User }) {
             />
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          {message && <p className="text-sm text-muted-foreground">{message}</p>}
+        {/* ✅ --- MODIFIED: Improved Footer --- */}
+        <CardFooter className="flex justify-between items-center">
+          {message && (
+            <p
+              className={cn(
+                "text-sm",
+                message.type === "error"
+                  ? "text-destructive" // Red for error
+                  : "text-green-600", // Green for success
+              )}
+            >
+              {message.content}
+            </p>
+          )}
           <Button type="submit" className="ml-auto" disabled={loading}>
             {loading ? "Updating..." : "Update Profile"}
           </Button>
         </CardFooter>
+        {/* ----------------------------------- */}
       </form>
     </Card>
   );
