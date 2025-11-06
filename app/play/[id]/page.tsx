@@ -1,9 +1,11 @@
+// app/play/[id]/page.tsx
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import { type Quiz } from "@/app/dashboard/quiz-list";
-import { PlayQuizForm } from "./play-quiz-form";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
+// ✅ 1. Import the new client component
+import {PlayQuizFlow} from "./play-quiz-flow";
 
 // Define local types based on the imported Quiz type
 type QuestionWithAnswer = NonNullable<Quiz["questions"]>[number];
@@ -24,17 +26,14 @@ async function getPlayerQuiz(id: string) {
   }
 
   // CRITICAL: Strip the correct answers before sending to the client
-  // ✅ MODIFIED this mapping
   const playerQuestions = quiz.questions?.map((q: QuestionWithAnswer) => ({
     id: q.id,
     text: q.text,
-    image_url: q.image_url || null, // ✅ PASS THE IMAGE URL
+    image_url: q.image_url || null,
     options: q.options.map((opt: Option) => ({ id: opt.id, text: opt.text })),
     // correctAnswerId is intentionally removed
   }));
 
-  // We must cast this to Quiz, but it's now a "PlayerQuiz"
-  // This is safe because PlayQuizForm only needs these fields
   return { ...quiz, questions: playerQuestions } as Quiz;
 }
 
@@ -69,8 +68,8 @@ export default async function PlayQuizPage({
           </CardHeader>
         </Card>
 
-        {/* Pass the answer-less quiz to the client form */}
-        <PlayQuizForm quiz={quiz} />
+        {/* ✅ 2. Render the new client component with the quiz data */}
+        <PlayQuizFlow quiz={quiz} />
       </div>
     </div>
   );

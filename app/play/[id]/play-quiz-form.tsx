@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { submitQuiz } from "./actions";
 import { Check, Loader2, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,9 +27,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Image from "next/image";
 
-export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
+// ✅ FIX: Removed '?' from playerName to make it required
+type Props = {
+  quiz: Quiz;
+  /** The player's name to record with the submission */
+  playerName: string;
+};
+
+export function PlayQuizForm({ quiz, playerName }: Props) {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(
     new Map(),
   );
@@ -53,7 +60,6 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
-      // ✅ FIX: Changed from + 1 to - 1
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
@@ -61,7 +67,8 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await submitQuiz(quiz.id, selectedAnswers);
+    // This will now work, as playerName is guaranteed to be a 'string'
+    await submitQuiz(quiz.id, selectedAnswers, playerName);
   };
 
   if (!currentQuestion) {
@@ -121,6 +128,7 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
               </div>
             )}
           </CardHeader>
+
           <CardContent className="space-y-3">
             {currentQuestion.options.map((opt) => {
               const isSelected =
@@ -128,7 +136,9 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
               return (
                 <div
                   key={opt.id}
-                  onClick={() => handleSelectAnswer(currentQuestion.id, opt.id)}
+                  onClick={() =>
+                    handleSelectAnswer(currentQuestion.id, opt.id)
+                  }
                   className={cn(
                     "flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all",
                     isSelected
@@ -151,6 +161,7 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
               );
             })}
           </CardContent>
+
           <CardFooter className="flex justify-between">
             <Button
               type="button"
@@ -163,7 +174,9 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
 
             {currentQuestionIndex === questions.length - 1 ? (
               <Button type="submit" disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Submit Quiz
               </Button>
             ) : (

@@ -12,38 +12,42 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { type Quiz } from "@/app/dashboard/quiz-list";
 import { cn } from "@/lib/utils";
+// ✅ 1. Import the new LiveLeaderboard component
+import { LiveLeaderboard } from "@/components/live-leaderboard";
 
 //  Helper to get the quiz with correct answers (runs on server)
 async function getQuizWithAnswers(id: string) {
   const supabase = await createClient();
   const { data: quiz, error } = await supabase
     .from("quizzes")
-    .select("id, title, questions") // We only need questions
+    .select("id, title, questions")
     .eq("id", id)
     .single();
 
   if (error || !quiz) {
     return null;
   }
-  return quiz as Quiz; // This Quiz type includes correct answers
+  return quiz as Quiz;
 }
 
 export default async function ResultsPage({
-  params, // Get quiz ID from the URL path
+  params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
   searchParams: Promise<{
     score: string;
     total: string;
-    answers: string; // Get the user's answers
+    answers: string;
+    submissionId: string; // ✅ 2. Get the new submissionId
   }>;
 }) {
-  const { id } = await params; // Get the quiz ID
+  const { id } = await params;
   const {
     score: scoreStr,
     total: totalStr,
     answers: answersStr,
+    submissionId, // ✅ 3. Destructure submissionId
   } = await searchParams;
 
   // --- 1. Get Score and Total (Existing Logic) ---
@@ -55,14 +59,12 @@ export default async function ResultsPage({
   const quiz = await getQuizWithAnswers(id);
   let userAnswers = new Map<string, string>();
   try {
-    // Parse the answers string from the URL
     const parsedAnswers: [string, string][] = JSON.parse(
       decodeURIComponent(answersStr || "[]"),
     );
     userAnswers = new Map(parsedAnswers);
   } catch (e) {
     console.error("Failed to parse answers", e);
-    // If parsing fails, we'll just show the score card
   }
 
   const allQuestions = quiz?.questions;
@@ -91,7 +93,6 @@ export default async function ResultsPage({
             </p>
           </div>
 
-          {/* ✅ UPDATED: Removed 'sm:flex-row' to keep buttons stacked */}
           <div className="flex flex-col gap-2 w-full">
             <Button asChild className="w-full" variant="outline">
               <Link href={`/play/${id}`}>
@@ -106,12 +107,18 @@ export default async function ResultsPage({
         </CardContent>
       </Card>
 
+      {/* ✅ 4. Add the LiveLeaderboard component here */}
+      <div className="w-full max-w-2xl mt-8">
+        <LiveLeaderboard quizId={id} currentSubmissionId={submissionId} />
+      </div>
+
       {/* Answer Review Section */}
       {allQuestions && allQuestions.length > 0 && (
         <div className="w-full max-w-2xl mt-8">
           <h2 className="text-2xl font-bold mb-4 text-center md:text-left">
             Answer Review
           </h2>
+          {/* ... (rest of the answer review logic is unchanged) ... */}
           <div className="space-y-6">
             {allQuestions.map((q, index) => {
               const userAnswerId = userAnswers.get(q.id);
@@ -135,15 +142,12 @@ export default async function ResultsPage({
                           key={opt.id}
                           className={cn(
                             "flex items-center gap-3 p-3 rounded-md border text-sm",
-                            // Style for the correct answer (always green)
                             isCorrectAnswer &&
                               "border-green-500 bg-green-50 dark:bg-green-900/20 dark:border-green-700",
-                            // Style for the user's wrong selection (red)
                             isWrongAnswer &&
                               "border-destructive bg-destructive/10 dark:bg-destructive/20 dark:border-destructive/50",
                           )}
                         >
-                          {/* Icon logic */}
                           {isCorrectAnswer ? (
                             <CheckCircle className="h-4 w-4 text-green-600 shrink-0" />
                           ) : isWrongAnswer ? (
@@ -154,7 +158,6 @@ export default async function ResultsPage({
 
                           <span className="flex-1">{opt.text}</span>
 
-                          {/* Badge logic */}
                           {isWrongAnswer && (
                             <Badge variant="destructive" className="ml-auto">
                               Your Answer

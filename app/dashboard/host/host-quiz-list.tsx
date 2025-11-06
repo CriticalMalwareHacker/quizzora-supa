@@ -4,7 +4,9 @@ import { useState } from "react";
 import { type Quiz } from "../quiz-list";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Check, Clipboard, FileText } from "lucide-react";
+// ✅ 1. Import new icons
+import { Check, Clipboard, FileText, BarChart } from "lucide-react";
+import Link from "next/link"; // ✅ 2. Import Link
 
 export function HostQuizList({ quizzes }: { quizzes: Quiz[] }) {
   const [copiedQuizId, setCopiedQuizId] = useState<string | null>(null);
@@ -43,21 +45,30 @@ export function HostQuizList({ quizzes }: { quizzes: Quiz[] }) {
                 </span>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => handleCopyLink(quiz.id)}
-              className="w-[130px]"
-            >
-              {copiedQuizId === quiz.id ? (
-                <>
-                  <Check className="h-4 w-4 mr-2 text-green-600" /> Copied!
-                </>
-              ) : (
-                <>
-                  <Clipboard className="h-4 w-4 mr-2" /> Copy Link
-                </>
-              )}
-            </Button>
+            {/* ✅ 3. Add button group */}
+            <div className="flex gap-2">
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/dashboard/leaderboard/${quiz.id}`}>
+                  <BarChart className="h-4 w-4 mr-2" />
+                  Leaderboard
+                </Link>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleCopyLink(quiz.id)}
+                className="w-[130px]"
+              >
+                {copiedQuizId === quiz.id ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2 text-green-600" /> Copied!
+                  </>
+                ) : (
+                  <>
+                    <Clipboard className="h-4 w-4 mr-2" /> Copy Link
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ))}
