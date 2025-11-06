@@ -15,16 +15,16 @@ export default async function ProtectedPage() {
     redirect("/auth/login");
   }
 
-  // --- NEW: Fetch Quizzes ---
-  // RLS ensures we only get quizzes for the logged-in user
+  // --- MODIFIED: Fetch Quizzes ---
+  // We've added .eq('user_id', data.claims.sub) to filter by the logged-in user
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
     .select("id, title, created_at, questions, cover_image_url")
+    .eq("user_id", data.claims.sub) // ✅ ADD THIS LINE
     .order("created_at", { ascending: false });
 
   if (quizError) {
     console.error("Error fetching quizzes:", quizError.message);
-    // You could show an error message to the user here
   }
   // -------------------------
 
@@ -39,10 +39,7 @@ export default async function ProtectedPage() {
         </Button>
       </div>
 
-      {/* --- NEW: Display Quiz List --- */}
-      {/* We pass the server-fetched data to the client component */}
       <QuizList quizzes={(quizzes as Quiz[]) || []} />
-      {/* ----------------------------- */}
     </div>
   );
 }

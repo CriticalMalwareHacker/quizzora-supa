@@ -1,0 +1,68 @@
+import { createClient } from "@/lib/supabase/server";
+import { notFound } from "next/navigation";
+import { type Quiz } from "@/app/dashboard/quiz-list";
+import { PlayQuizForm } from "./play-quiz-form";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+
+// Fetch quiz data, but strip the answers
+async function getPlayerQuiz(id: string) {
+  const supabase = await createClient();
+
+  const { data: quiz, error } = await supabase
+    .from("quizzes")
+    .select("id, title, cover_image_url, questions")
+    .eq("id", id)
+    .single();
+
+  if (error || !quiz) {
+    return null;
+  }
+
+  // CRITICAL: Strip the correct answers before sending to the client
+  const playerQuestions = quiz.questions?.map((q: any) => ({
+    id: q.id,
+    text: q.text,
+    options: q.options.map((opt: any) => ({ id: opt.id, text: opt.text })),
+    // correctAnswerId is intentionally removed
+  }));
+
+  return { ...quiz, questions: playerQuestions } as Quiz;
+}
+
+export default async function PlayQuizPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const quiz = await getPlayerQuiz(params.id);
+
+  if (!quiz) {
+    notFound();
+  }
+
+  return (
+    <div className="flex flex-col items-center min-h-screen p-4 md:p-10">
+      <div className="w-full max-w-2xl">
+        <Card className="mb-6 overflow-hidden">
+          {quiz.cover_image_url && (
+            <div className="relative w-full h-48">
+              <Image
+                src={quiz.cover_image_url}
+                alt={quiz.title || "Quiz cover"}
+                fill
+                className="object-cover"
+              />
+            </div>
+          )}
+          <CardHeader>
+            <CardTitle className="text-2xl">{quiz.title}</CardTitle>
+          </CardHeader>
+        </Card>
+        
+        {/* Pass the answer-less quiz to the client form */}
+        <PlayQuizForm quiz={quiz} />
+      </div>
+    </div>
+  );
+}
