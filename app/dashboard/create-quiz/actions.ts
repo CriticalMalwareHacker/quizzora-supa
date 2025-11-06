@@ -20,6 +20,7 @@ You must respond with a JSON object in the following format:
   "questions": [
     {
       "text": "The question text?",
+      "image_suggestion": "A brief, 2-5 word description of a relevant image (e.g., 'Eiffel Tower', 'Human skeleton'). This can be null.",
       "options": [
         { "text": "Option 1" },
         { "text": "Option 2" },
@@ -53,8 +54,15 @@ Ensure 'correctAnswerText' exactly matches the text of one of the options.`;
 
     const parsedQuiz = JSON.parse(content);
     return { data: parsedQuiz };
-  } catch (error: any) {
-    console.error("OpenAI API Error:", error.message);
-    return { error: `Failed to generate quiz: ${error.message}` };
+  } catch (error) {
+    // ✅ FIXED: Used 'unknown' type and checked if it's an Error instance
+    let errorMessage = "Failed to generate quiz";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    }
+    console.error("OpenAI API Error:", errorMessage);
+    return { error: `Failed to generate quiz: ${errorMessage}` };
   }
 }

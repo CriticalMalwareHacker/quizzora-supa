@@ -240,8 +240,13 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
       }
 
       router.push("/dashboard");
-    } catch (error: any) {
-      setError(error.message || String(error));
+    } catch (error) {
+      // ✅ FIXED: Used 'unknown' type and checked if it's an Error instance
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error) || "An unknown error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

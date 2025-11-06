@@ -308,8 +308,13 @@ export default function CreateQuizPage() {
 
       // Success! Redirect to the dashboard.
       router.push("/dashboard");
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      // ✅ FIXED: Used 'unknown' type and checked if it's an Error instance
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError(String(error) || "An unknown error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -362,8 +367,13 @@ export default function CreateQuizPage() {
       setQuestions(newQuestions);
       setIsAiModalOpen(false);
       setAiPrompt("");
-    } catch (error: any) {
-      setAiError(error.message || "Failed to generate quiz.");
+    } catch (error) {
+      // ✅ FIXED: Used 'unknown' type and checked if it's an Error instance
+      if (error instanceof Error) {
+        setAiError(error.message);
+      } else {
+        setAiError(String(error) || "Failed to generate quiz.");
+      }
     } finally {
       setIsAiLoading(false);
     }
