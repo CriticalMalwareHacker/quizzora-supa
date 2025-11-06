@@ -42,7 +42,7 @@ export default async function ResultsPage({
             </p>
           </div>
           <Button asChild className="w-full">
-            <Link href="/">Back to Home</Link>
+            <Link href="/dashboard">Back to Home</Link>
           </Button>
         </CardContent>
       </Card>

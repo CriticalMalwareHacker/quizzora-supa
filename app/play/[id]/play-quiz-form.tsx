@@ -12,10 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { submitQuiz } from "./actions"; // We will create this next
+import { submitQuiz } from "./actions";
 import { Check, Loader2 } from "lucide-react";
 
-// The 'quiz' prop here has NO answers
 export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(
     new Map(),
@@ -44,18 +43,22 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     }
   };
 
-  // When the form is submitted, call the Server Action
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // ✅ 1. This function REPLACES the original 'handleSubmit'
+  // We call this from 'onClick' so we are not using stale form state.
+  const handleFinalSubmit = async () => {
     setIsLoading(true);
-    // 'submitQuiz' is a Server Action.
-    // We pass it the quiz ID and the answers.
-    // It will securely grade the quiz on the server and handle the redirect.
+    // We pass 'selectedAnswers' directly. Since this is called via 'onClick',
+    // the state will be up-to-date from the user's last 'handleSelectAnswer'.
     await submitQuiz(quiz.id, selectedAnswers);
   };
 
+  // The original 'handleSubmit' triggered by onSubmit is no longer needed.
+  // We can remove it or just leave it un-used.
+
   return (
-    <form onSubmit={handleSubmit}>
+    // ✅ 2. Remove the 'onSubmit' from the form.
+    // We are now handling submission with our button's onClick.
+    <form>
       <Card>
         <CardHeader>
           <CardTitle>
@@ -105,7 +108,14 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
           </Button>
 
           {currentQuestionIndex === questions.length - 1 ? (
-            <Button type="submit" disabled={isLoading}>
+            // ✅ 3. Change button to type="button" and add onClick
+            <Button
+              type="button"
+              onClick={handleFinalSubmit}
+              disabled={
+                isLoading || !selectedAnswers.has(currentQuestion.id)
+              } // Also disable if last question isn't answered
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Submit Quiz
             </Button>
