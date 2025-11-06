@@ -4,7 +4,8 @@ import {
   IconSettings,
   IconUser,
   IconLogout,
-  IconUsersGroup, // 1. Import the new icon
+  IconUsersGroup,
+  IconPlayerPlay, // 1. Import the new icon
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
 
@@ -19,15 +20,20 @@ const sidebarLinks = [
     href: "/dashboard/profile",
     icon: <IconUser className="h-5 w-5" />,
   },
-  // 2. Add the new "Host Quiz" link here
   {
     label: "Host Quiz",
     href: "/dashboard/host",
     icon: <IconUsersGroup className="h-5 w-5" />,
   },
+  // 2. Add the new "Join Quiz" link here
+  {
+    label: "Join Quiz",
+    href: "/dashboard/join",
+    icon: <IconPlayerPlay className="h-5 w-5" />,
+  },
   {
     label: "Settings",
-    href: "/settings", // This path seems to be outside /dashboard, is that intentional?
+    href: "/settings",
     icon: <IconSettings className="h-5 w-5" />,
   },
 ];
