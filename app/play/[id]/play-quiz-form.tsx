@@ -13,7 +13,19 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { submitQuiz } from "./actions";
-import { Check, Loader2 } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
+import Link from "next/link";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(
@@ -31,7 +43,12 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     setSelectedAnswers(newAnswers);
   };
 
-  const handleNext = () => {
+  // ✅ --- FIX: This function now accepts the click event ---
+  const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // ✅ This line is critical. It stops the click from
+    // submitting the form or bubbling up.
+    e.preventDefault(); 
+    
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -43,89 +60,108 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     }
   };
 
-  // ✅ 1. This function REPLACES the original 'handleSubmit'
-  // We call this from 'onClick' so we are not using stale form state.
-  const handleFinalSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // We pass 'selectedAnswers' directly. Since this is called via 'onClick',
-    // the state will be up-to-date from the user's last 'handleSelectAnswer'.
     await submitQuiz(quiz.id, selectedAnswers);
   };
 
-  // The original 'handleSubmit' triggered by onSubmit is no longer needed.
-  // We can remove it or just leave it un-used.
-
   return (
-    // ✅ 2. Remove the 'onSubmit' from the form.
-    // We are now handling submission with our button's onClick.
-    <form>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </CardTitle>
-          <CardDescription className="text-lg pt-2">
-            {currentQuestion.text}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {currentQuestion.options.map((opt) => {
-            const isSelected = selectedAnswers.get(currentQuestion.id) === opt.id;
-            return (
-              <div
-                key={opt.id}
-                onClick={() => handleSelectAnswer(currentQuestion.id, opt.id)}
-                className={cn(
-                  "flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all",
-                  isSelected
-                    ? "border-primary bg-primary/10"
-                    : "hover:bg-accent/50",
-                )}
-              >
+    <AlertDialog>
+      <form onSubmit={handleSubmit}>
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle>
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </CardTitle>
+                <CardDescription className="text-lg pt-2">
+                  {currentQuestion.text}
+                </CardDescription>
+              </div>
+
+              <AlertDialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </AlertDialogTrigger>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {currentQuestion.options.map((opt) => {
+              const isSelected =
+                selectedAnswers.get(currentQuestion.id) === opt.id;
+              return (
                 <div
+                  key={opt.id}
+                  onClick={() => handleSelectAnswer(currentQuestion.id, opt.id)}
                   className={cn(
-                    "h-6 w-6 rounded-full border flex items-center justify-center shrink-0",
+                    "flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition-all",
                     isSelected
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "border-muted-foreground",
+                      ? "border-primary bg-primary/10"
+                      : "hover:bg-accent/50",
                   )}
                 >
-                  {isSelected && <Check className="h-4 w-4" />}
+                  <div
+                    className={cn(
+                      "h-6 w-6 rounded-full border flex items-center justify-center shrink-0",
+                      isSelected
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-muted-foreground",
+                    )}
+                  >
+                    {isSelected && <Check className="h-4 w-4" />}
+                  </div>
+                  <span>{opt.text}</span>
                 </div>
-                <span>{opt.text}</span>
-              </div>
-            );
-          })}
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleBack}
-            disabled={currentQuestionIndex === 0}
-          >
-            Back
-          </Button>
-
-          {currentQuestionIndex === questions.length - 1 ? (
-            // ✅ 3. Change button to type="button" and add onClick
+              );
+            })}
+          </CardContent>
+          <CardFooter className="flex justify-between">
             <Button
               type="button"
-              onClick={handleFinalSubmit}
-              disabled={
-                isLoading || !selectedAnswers.has(currentQuestion.id)
-              } // Also disable if last question isn't answered
+              variant="outline"
+              onClick={handleBack}
+              disabled={currentQuestionIndex === 0}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Submit Quiz
+              Back
             </Button>
-          ) : (
-            <Button type="button" variant="default" onClick={handleNext}>
-              Next
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
-    </form>
+
+            {currentQuestionIndex === questions.length - 1 ? (
+              <Button type="submit" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Submit Quiz
+              </Button>
+            ) : (
+              // ✅ --- FIX: The onClick now passes the event to handleNext ---
+              <Button type="button" variant="default" onClick={handleNext}>
+                Next
+              </Button>
+            )}
+          </CardFooter>
+        </Card>
+      </form>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure you want to exit?</AlertDialogTitle>
+          <AlertDialogDescription>
+            All your progress for this quiz will be lost.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Continue Quiz</AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Link href="/dashboard/join">Exit</Link>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
