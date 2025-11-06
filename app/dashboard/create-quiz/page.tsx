@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+// This import is now correct (Upload has been removed)
 import { Plus, Trash2, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -18,6 +19,8 @@ import { cn } from "@/lib/utils";
 // --- New Imports ---
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+// ✅ Import Image from next/image
+import Image from "next/image";
 // -------------------
 
 // Define types for our quiz structure
@@ -41,6 +44,11 @@ export default function CreateQuizPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  // ✅ Add state for cover image
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
+    null,
+  );
   // -----------------
 
   // --- Quiz Management (No changes) ---
@@ -120,6 +128,7 @@ export default function CreateQuizPage() {
   };
 
   // --- Updated Save Quiz Logic ---
+  // This entire function has been replaced with the corrected version.
   const handleSaveQuiz = async () => {
     setIsLoading(true);
     setError(null);
@@ -137,17 +146,63 @@ export default function CreateQuizPage() {
       return;
     }
 
-    // 2. Prepare the data for insertion
-    const quizData = {
-      user_id: user.id,
-      title: title,
-      questions: questions, // The 'questions' state array is saved as JSONB
+    // ✅ 1. Generate a new UUID for the quiz ID *before* anything else
+    const newQuizId = crypto.randomUUID();
+    let coverImageUrl: string | null = null;
+
+    // 2. Upload cover image if one is selected
+    if (coverImageFile) {
+      // ✅ 2. Use the newQuizId in the file path
+      const filePath = `${user.id}/${newQuizId}-${coverImageFile.name}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("quiz_covers")
+        .upload(filePath, coverImageFile, {
+          cacheControl: "3600",
+          upsert: true, // Use upsert in case user retries
+        });
+
+      if (uploadError) {
+        setError(`Failed to upload image: ${uploadError.message}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Get the public URL
+      const { data: publicUrlData } = supabase.storage
+        .from("quiz_covers")
+        .getPublicUrl(uploadData.path);
+
+      if (!publicUrlData) {
+        setError("Failed to get public URL for image.");
+        setIsLoading(false);
+        return;
+      }
+      coverImageUrl = publicUrlData.publicUrl;
+    }
+
+    // ✅ 3. Define a specific type for our new quiz data
+    type QuizInsertData = {
+      id: string;
+      user_id: string;
+      title: string;
+      questions: Question[];
+      cover_image_url: string | null;
     };
 
-    // 3. Insert into the 'quizzes' table
+    // 4. Prepare the final data for insertion (replaces 'any' type)
+    const quizData: QuizInsertData = {
+      id: newQuizId, // ✅ 4. Pass the new ID to the database
+      user_id: user.id,
+      title: title,
+      questions: questions,
+      cover_image_url: coverImageUrl,
+    };
+
+    // 5. Insert into the 'quizzes' table
     const { error: insertError } = await supabase
       .from("quizzes")
-      .insert(quizData);
+      .insert(quizData); // Insert the single, complete object
 
     if (insertError) {
       setError(insertError.message);
@@ -155,6 +210,15 @@ export default function CreateQuizPage() {
     } else {
       // Success! Redirect to the dashboard.
       router.push("/dashboard");
+    }
+  };
+
+  // ✅ New handler for file input change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setCoverImageFile(file);
+      setCoverImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -186,6 +250,28 @@ export default function CreateQuizPage() {
             onChange={(e) => setTitle(e.target.value)}
             className="text-lg"
           />
+        </CardContent>
+
+        {/* ✅ Add Cover Image Upload Section */}
+        <CardContent>
+          <Label htmlFor="cover-image">Cover Image</Label>
+          <Input
+            id="cover-image"
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleFileChange}
+            className="file:text-primary file:font-medium"
+          />
+          {coverImagePreview && (
+            <div className="mt-4 relative w-full h-48">
+              <Image
+                src={coverImagePreview}
+                alt="Cover image preview"
+                fill // This prop is now correct (not layout="fill")
+                className="rounded-md object-cover"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

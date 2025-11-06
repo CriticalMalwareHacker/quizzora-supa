@@ -19,7 +19,7 @@ export default async function ProtectedPage() {
   // RLS ensures we only get quizzes for the logged-in user
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
-    .select("id, title, created_at, questions")
+    .select("id, title, created_at, questions, cover_image_url")
     .order("created_at", { ascending: false });
 
   if (quizError) {
