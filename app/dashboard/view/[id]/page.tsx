@@ -15,6 +15,8 @@ import Link from "next/link";
 // corrected import path
 import { type Quiz } from "../../quiz-list";
 import { cn } from "@/lib/utils";
+// ✅ Import Image
+import Image from "next/image";
 
 async function getQuiz(id: string) {
   const supabase = await createClient();
@@ -73,7 +75,19 @@ export default async function ViewQuizPage({
         </Link>
       </Button>
 
-      <Card className="mb-6">
+      <Card className="mb-6 overflow-hidden">
+        {/* ✅ Display Cover Image */}
+        {quiz.cover_image_url && (
+          <div className="relative w-full h-48 md:h-64">
+            <Image
+              src={quiz.cover_image_url}
+              alt={quiz.title || "Quiz cover image"}
+              layout="fill"
+              className="object-cover"
+            />
+          </div>
+        )}
+
         <CardHeader>
           <CardTitle className="text-3xl">
             {quiz.title || "Untitled Quiz"}

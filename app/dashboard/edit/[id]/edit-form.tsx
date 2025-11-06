@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, CheckCircle, Circle } from "lucide-react";
+import { Plus, Trash2, CheckCircle, Circle, Upload } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 
 // FIX: Update import path to go up two levels
-import { type Quiz } from "../../quiz-list"; 
+import { type Quiz } from "../../quiz-list";
 
 // Define local types
 type Option = { id: string; text: string };
@@ -30,13 +30,24 @@ type Question = {
 };
 
 // Renamed component to EditForm
-export function EditForm({ quiz }: { quiz: Quiz }) { 
+export function EditForm({ quiz }: { quiz: Quiz }) {
   // Initialize state from the quiz prop
   const [title, setTitle] = useState(quiz.title || "");
   const [questions, setQuestions] = useState<Question[]>(quiz.questions || []);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // ✅ Add state for cover image
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(
+    quiz.cover_image_url,
+  );
+  const [newCoverImageFile, setNewCoverImageFile] = useState<File | null>(
+    null,
+  );
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
+    quiz.cover_image_url,
+  );
 
   // --- All question/option management functions are identical ---
 
@@ -114,15 +125,59 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
     );
   };
 
-  // --- Save Quiz Logic (identical) ---
+  // --- Save Quiz Logic (identical, with cover image upload) ---
   const handleUpdateQuiz = async () => {
     setIsLoading(true);
     setError(null);
     const supabase = createClient();
 
+    // ✅ Get user to create storage path
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      setError("You must be logged in to update a quiz.");
+      setIsLoading(false);
+      return;
+    }
+
+    let updatedCoverUrl = coverImageUrl;
+
+    // ✅ Upload new cover image if one was selected
+    if (newCoverImageFile) {
+      const filePath = `${user.id}/${quiz.id}-${newCoverImageFile.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("quiz_covers")
+        .upload(filePath, newCoverImageFile, {
+          cacheControl: "3600",
+          upsert: true, // Overwrite existing image for this quiz
+        });
+
+      if (uploadError) {
+        setError(`Failed to upload image: ${uploadError.message}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // Get the new public URL
+      const { data: publicUrlData } = supabase.storage
+        .from("quiz_covers")
+        .getPublicUrl(uploadData.path);
+
+      if (!publicUrlData) {
+        setError("Failed to get public URL for image.");
+        setIsLoading(false);
+        return;
+      }
+      updatedCoverUrl = publicUrlData.publicUrl;
+    }
+
     const quizData = {
       title: title,
       questions: questions,
+      cover_image_url: updatedCoverUrl, // ✅ Save the new or existing URL
     };
 
     const { error: updateError } = await supabase
@@ -135,6 +190,15 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
       setIsLoading(false);
     } else {
       router.push("/dashboard");
+    }
+  };
+
+  // ✅ New handler for file input change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setNewCoverImageFile(file);
+      setCoverImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -165,6 +229,28 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
             onChange={(e) => setTitle(e.target.value)}
             className="text-lg"
           />
+        </CardContent>
+
+        {/* ✅ Add Cover Image Upload Section */}
+        <CardContent>
+          <Label htmlFor="cover-image">Cover Image</Label>
+          <Input
+            id="cover-image"
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleFileChange}
+            className="file:text-primary file:font-medium"
+          />
+          {coverImagePreview && (
+            <div className="mt-4 relative w-full h-48">
+              {/* Use a plain <img> for preview to avoid next/image / DOM Image conflicts */}
+              <img
+                src={coverImagePreview}
+                alt="Cover image preview"
+                className="rounded-md object-cover w-full h-full"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

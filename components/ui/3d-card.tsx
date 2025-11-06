@@ -1,5 +1,5 @@
 "use client";
-
+import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
 import React, {
@@ -105,6 +105,7 @@ export const CardItem = ({
   rotateX = 0,
   rotateY = 0,
   rotateZ = 0,
+  asChild = false,
   ...rest
 }: {
   as?: React.ElementType;
@@ -116,6 +117,7 @@ export const CardItem = ({
   rotateX?: number | string;
   rotateY?: number | string;
   rotateZ?: number | string;
+  asChild?: boolean;
   [key: string]: any;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -133,15 +135,15 @@ export const CardItem = ({
       ref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;
     }
   };
-
+  const Comp = asChild ? Slot : Tag;
   return (
-    <Tag
+    <Comp
       ref={ref}
       className={cn("w-fit transition duration-200 ease-linear", className)}
       {...rest}
     >
       {children}
-    </Tag>
+    </Comp>
   );
 };
 

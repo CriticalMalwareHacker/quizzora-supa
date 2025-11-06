@@ -3,6 +3,8 @@
 // New imports for client-side logic
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 // Import 3D Card components
@@ -13,8 +15,8 @@ import {
 } from "@/components/ui/3d-card";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { FileText, Eye, Edit, Trash2 } from "lucide-react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +44,7 @@ export type Quiz = {
   title: string;
   created_at: string;
   questions: Question[] | null;
+  cover_image_url: string | null;
 };
 
 type QuizListProps = {
@@ -65,8 +68,7 @@ export function QuizList({ quizzes }: QuizListProps) {
     if (error) {
       // If it fails, log the error and revert the state
       console.error("Failed to delete quiz:", error.message);
-      setCurrentQuizzes(quizzes); // Revert to original data
-      // You could show an error toast here
+      setCurrentQuizzes(quizzes); // Revert to original data (props)
     } else {
       // Refresh server-side props to ensure consistency
       router.refresh();
@@ -74,13 +76,11 @@ export function QuizList({ quizzes }: QuizListProps) {
   };
 
   // Handle the empty state
-  if (currentQuizzes.length === 0) {
+  if (!currentQuizzes || currentQuizzes.length === 0) {
     return (
       <div className="border rounded-lg border-dashed p-8 text-center text-muted-foreground">
         <h3 className="text-lg font-semibold">No quizzes found</h3>
-        <p className="text-sm">
-          Get started by creating your first quiz!
-        </p>
+        <p className="text-sm">Get started by creating your first quiz!</p>
       </div>
     );
   }
@@ -94,14 +94,12 @@ export function QuizList({ quizzes }: QuizListProps) {
   };
 
   return (
-    <AlertDialog>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {currentQuizzes.map((quiz) => (
-          // 1. Replaced <Card> with <CardContainer>
-          <CardContainer key={quiz.id} className="inter-var">
-            {/* 2. Replaced CardHeader/Content/Footer with <CardBody> */}
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(340px,1fr))]">
+      {currentQuizzes.map((quiz) => (
+        <AlertDialog key={quiz.id}>
+          <CardContainer className="inter-var">
+            {/* Card Body with 3D Card components */}
             <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-full h-auto rounded-xl p-6 border flex flex-col">
-              {/* 3. Replaced <CardTitle> with <CardItem> */}
               <CardItem
                 translateZ="50"
                 className="text-xl font-bold text-neutral-600 dark:text-white"
@@ -109,7 +107,6 @@ export function QuizList({ quizzes }: QuizListProps) {
                 {quiz.title || "Untitled Quiz"}
               </CardItem>
 
-              {/* 4. Replaced <CardDescription> with <CardItem> */}
               <CardItem
                 as="p"
                 translateZ="60"
@@ -118,8 +115,17 @@ export function QuizList({ quizzes }: QuizListProps) {
                 Created on: {formatDate(quiz.created_at)}
               </CardItem>
 
-              {/* 5. Replaced <CardContent> with <CardItem> */}
-              {/* Added flex-grow to push footer to bottom */}
+              {/* Cover image (new) */}
+              <CardItem translateZ="100" className="w-full mt-4 h-40 relative">
+                <Image
+                  src={quiz.cover_image_url || "/quizhero.jpg"}
+                  alt={quiz.title || "Quiz cover image"}
+                  fill
+                  className="object-cover rounded-xl group-hover/card:shadow-xl"
+                />
+              </CardItem>
+
+              {/* Content showing number of questions */}
               <div className="flex-grow mt-6">
                 <CardItem
                   translateZ="40"
@@ -132,14 +138,15 @@ export function QuizList({ quizzes }: QuizListProps) {
                 </CardItem>
               </div>
 
-              {/* 6. Replaced <CardFooter> with a div and <CardItem> for buttons */}
+              {/* Footer actions */}
               <div className="flex justify-between items-center mt-8">
-                <CardItem
-                  translateZ={20}
-                  asChild // Use asChild to pass props to Button/Link
-                >
+                <CardItem translateZ={20} asChild>
                   <Button variant="outline" size="sm" asChild>
-                    <Link href={`/dashboard/view/${quiz.id}`}>
+                    {/* ✅ FIX: removed <a> wrapper */}
+                    <Link
+                      href={`/dashboard/view/${quiz.id}`}
+                      className="flex items-center"
+                    >
                       <Eye className="h-4 w-4 mr-2" />
                       View
                     </Link>
@@ -149,13 +156,18 @@ export function QuizList({ quizzes }: QuizListProps) {
                 <div className="flex gap-2">
                   <CardItem translateZ={20} asChild>
                     <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/dashboard/edit/${quiz.id}`}>
+                      {/* ✅ FIX: removed <a> wrapper */}
+                      <Link
+                        href={`/dashboard/edit/${quiz.id}`}
+                        className="flex items-center"
+                      >
                         <Edit className="h-4 w-4" />
                       </Link>
                     </Button>
                   </CardItem>
 
                   <CardItem translateZ={20} asChild>
+                    {/* Trigger for the alert dialog */}
                     <AlertDialogTrigger asChild>
                       <Button
                         variant="ghost"
@@ -170,15 +182,17 @@ export function QuizList({ quizzes }: QuizListProps) {
               </div>
             </CardBody>
 
-            {/* This is the modal content. It's kept as a sibling to CardBody 
-              so it doesn't get warped by the 3D transform.
-            */}
+            {/* Alert dialog content */}
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your quiz &quot;{quiz.title || "Untitled Quiz"}&quot;.
+                  This action cannot be undone. This will permanently delete your
+                  quiz{" "}
+                  <span className="font-medium">
+                    "{quiz.title || "Untitled Quiz"}"
+                  </span>
+                  .
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -192,8 +206,8 @@ export function QuizList({ quizzes }: QuizListProps) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </CardContainer>
-        ))}
-      </div>
-    </AlertDialog>
+        </AlertDialog>
+      ))}
+    </div>
   );
 }

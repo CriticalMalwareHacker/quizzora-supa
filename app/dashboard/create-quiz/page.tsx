@@ -11,13 +11,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, CheckCircle, Circle } from "lucide-react";
+import { Plus, Trash2, CheckCircle, Circle, Upload } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 // --- New Imports ---
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+// ✅ Import Image from next/image
+import Image from "next/image";
 // -------------------
 
 // Define types for our quiz structure
@@ -41,6 +43,11 @@ export default function CreateQuizPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  // ✅ Add state for cover image
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+  const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
+    null,
+  );
   // -----------------
 
   // --- Quiz Management (No changes) ---
@@ -138,16 +145,55 @@ export default function CreateQuizPage() {
     }
 
     // 2. Prepare the data for insertion
-    const quizData = {
+    const quizData: any = {
       user_id: user.id,
       title: title,
       questions: questions, // The 'questions' state array is saved as JSONB
     };
 
-    // 3. Insert into the 'quizzes' table
+    let coverImageUrl: string | null = null;
+
+    // 2. Upload cover image if one is selected
+    if (coverImageFile) {
+      const filePath = `${user.id}/${
+        quizData.id
+      }-${coverImageFile.name}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("quiz_covers")
+        .upload(filePath, coverImageFile, {
+          cacheControl: "3600",
+          upsert: true, // Allow overwriting if file exists (e.g., re-saving draft)
+        });
+
+      if (uploadError) {
+        setError(`Failed to upload image: ${uploadError.message}`);
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. Get the public URL
+      const { data: publicUrlData } = supabase.storage
+        .from("quiz_covers")
+        .getPublicUrl(uploadData.path);
+
+      if (!publicUrlData) {
+        setError("Failed to get public URL for image.");
+        setIsLoading(false);
+        return;
+      }
+      coverImageUrl = publicUrlData.publicUrl;
+    }
+
+    // 4. Prepare the data for insertion
+    const quizDataWithCover = {
+      ...quizData,
+      cover_image_url: coverImageUrl,
+    };
+
+    // 5. Insert into the 'quizzes' table
     const { error: insertError } = await supabase
       .from("quizzes")
-      .insert(quizData);
+      .insert(quizDataWithCover); // Use data with cover image URL
 
     if (insertError) {
       setError(insertError.message);
@@ -155,6 +201,15 @@ export default function CreateQuizPage() {
     } else {
       // Success! Redirect to the dashboard.
       router.push("/dashboard");
+    }
+  };
+
+  // ✅ New handler for file input change
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setCoverImageFile(file);
+      setCoverImagePreview(URL.createObjectURL(file));
     }
   };
 
@@ -186,6 +241,28 @@ export default function CreateQuizPage() {
             onChange={(e) => setTitle(e.target.value)}
             className="text-lg"
           />
+        </CardContent>
+
+        {/* ✅ Add Cover Image Upload Section */}
+        <CardContent>
+          <Label htmlFor="cover-image">Cover Image</Label>
+          <Input
+            id="cover-image"
+            type="file"
+            accept="image/png, image/jpeg"
+            onChange={handleFileChange}
+            className="file:text-primary file:font-medium"
+          />
+          {coverImagePreview && (
+            <div className="mt-4 relative w-full h-48">
+              <Image
+                src={coverImagePreview}
+                alt="Cover image preview"
+                layout="fill"
+                className="rounded-md object-cover"
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
