@@ -9,7 +9,7 @@ import {
   IconChartBar, // ✅ 1. Import the new icon
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
-import { SidebarLogo } from "@/components/sidebar-logo";
+import { SidebarLogo } from "@/components/sidebar-logo"; // ✅ Added missing import
 
 const sidebarLinks = [
   {
@@ -55,15 +55,18 @@ export default function ProtectedLayout({
       <div className="flex flex-col md:flex-row h-screen">
         <SidebarBody className="bg-neutral-100/50 dark:bg-neutral-800/50 backdrop-blur-lg border-r border-neutral-200/50 dark:border-neutral-700/50">
           <div className="flex flex-col h-full">
-            
             <SidebarLogo />
 
-           <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
-              <IconLogout className="h-5 w-5 text-red-500" />
-              <LogoutButton />
+            {/* ✅ Map over the sidebarLinks here */}
+            <div className="flex flex-col space-y-4 flex-1 mt-6">
+              {sidebarLinks.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
             </div>
 
+            {/* ✅ Removed the duplicate logout section */}
             <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
+              <IconLogout className="h-5 w-5 text-red-500" />
               <LogoutButton />
             </div>
           </div>
