@@ -9,13 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Award } from "lucide-react";
 import Link from "next/link";
 
-export default function ResultsPage({
+export default async function ResultsPage({
   searchParams,
 }: {
-  searchParams: { score: string; total: string };
+  // Accept searchParams as a Promise and await it (Next 15+ / App Router)
+  searchParams: Promise<{ score: string; total: string }>;
 }) {
-  const score = Number(searchParams.score) || 0;
-  const total = Number(searchParams.total) || 0;
+  const { score: scoreStr, total: totalStr } = await searchParams;
+  const score = Number(scoreStr) || 0;
+  const total = Number(totalStr) || 0;
   const percentage = total > 0 ? (score / total) * 100 : 0;
 
   return (
@@ -23,9 +25,7 @@ export default function ResultsPage({
       <Card className="w-full max-w-md text-center">
         <CardHeader>
           <Award className="h-16 w-16 text-yellow-500 mx-auto" />
-          <CardTitle className="text-3xl font-bold mt-4">
-            Quiz Complete!
-          </CardTitle>
+          <CardTitle className="text-3xl font-bold mt-4">Quiz Complete!</CardTitle>
           <CardDescription>
             You have successfully submitted your answers.
           </CardDescription>
