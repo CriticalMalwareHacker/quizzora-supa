@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image"; // ✅ IMPORT IMAGE
 
 export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
   const [selectedAnswers, setSelectedAnswers] = useState<Map<string, string>>(
@@ -43,12 +44,8 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     setSelectedAnswers(newAnswers);
   };
 
-  // ✅ --- FIX: This function now accepts the click event ---
   const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // ✅ This line is critical. It stops the click from
-    // submitting the form or bubbling up.
-    e.preventDefault(); 
-    
+    e.preventDefault();
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
@@ -56,7 +53,7 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
 
   const handleBack = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
@@ -66,10 +63,30 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
     await submitQuiz(quiz.id, selectedAnswers);
   };
 
+  if (!currentQuestion) {
+    // Handle case where questions might be empty
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>No Questions</CardTitle>
+          <CardDescription>
+            This quiz does not have any questions yet.
+          </CardDescription>
+        </CardHeader>
+        <CardFooter>
+          <Button asChild variant="outline">
+            <Link href="/dashboard">Back to Dashboard</Link>
+          </Button>
+        </CardFooter>
+      </Card>
+    );
+  }
+
   return (
     <AlertDialog>
       <form onSubmit={handleSubmit}>
         <Card>
+          {/* ✅ MODIFIED CardHeader */}
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
@@ -92,6 +109,19 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
                 </Button>
               </AlertDialogTrigger>
             </div>
+
+            {/* ✅ NEW: Display image if it exists */}
+            {currentQuestion.image_url && (
+              <div className="relative w-full h-48 mt-4">
+                <Image
+                  src={currentQuestion.image_url}
+                  alt={`Image for question ${currentQuestionIndex + 1}`}
+                  fill
+                  className="rounded-md object-contain"
+                />
+              </div>
+            )}
+            {/* -------------------------------- */}
           </CardHeader>
           <CardContent className="space-y-3">
             {currentQuestion.options.map((opt) => {
@@ -139,7 +169,6 @@ export function PlayQuizForm({ quiz }: { quiz: Quiz }) {
                 Submit Quiz
               </Button>
             ) : (
-              // ✅ --- FIX: The onClick now passes the event to handleNext ---
               <Button type="button" variant="default" onClick={handleNext}>
                 Next
               </Button>

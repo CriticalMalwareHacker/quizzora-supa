@@ -5,10 +5,8 @@ import { PlayQuizForm } from "./play-quiz-form";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
-// ✅ FIX: Define local types based on the imported Quiz type
-// This is the shape of a single question *with* the answer
+// Define local types based on the imported Quiz type
 type QuestionWithAnswer = NonNullable<Quiz["questions"]>[number];
-// This is the shape of a single option
 type Option = QuestionWithAnswer["options"][number];
 
 // Fetch quiz data, but strip the answers
@@ -26,19 +24,20 @@ async function getPlayerQuiz(id: string) {
   }
 
   // CRITICAL: Strip the correct answers before sending to the client
-  // ✅ FIX: Replaced 'any' with the specific 'QuestionWithAnswer' type
+  // ✅ MODIFIED this mapping
   const playerQuestions = quiz.questions?.map((q: QuestionWithAnswer) => ({
     id: q.id,
     text: q.text,
-    // ✅ FIX: Replaced 'any' with the specific 'Option' type
+    image_url: q.image_url || null, // ✅ PASS THE IMAGE URL
     options: q.options.map((opt: Option) => ({ id: opt.id, text: opt.text })),
     // correctAnswerId is intentionally removed
   }));
 
+  // We must cast this to Quiz, but it's now a "PlayerQuiz"
+  // This is safe because PlayQuizForm only needs these fields
   return { ...quiz, questions: playerQuestions } as Quiz;
 }
 
-// ✅ FIX: accept params as a Promise and await it (Next 15+ / App Router)
 export default async function PlayQuizPage({
   params,
 }: {

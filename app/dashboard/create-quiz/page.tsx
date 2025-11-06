@@ -11,53 +11,87 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// This import is now correct (Upload has been removed)
-import { Plus, Trash2, CheckCircle, Circle } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle,
+  Circle,
+  Sparkles,
+  Loader2,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-// --- New Imports ---
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-// ✅ Import Image from next/image
 import Image from "next/image";
-// -------------------
+import { generateQuizWithAI } from "./actions";
 
 // Define types for our quiz structure
-type Option = {
+export type Option = {
   id: string;
   text: string;
 };
 
-type Question = {
+// ✅ MODIFIED Question type
+export type Question = {
   id: string;
   text: string;
   options: Option[];
   correctAnswerId: string | null;
+  image_url: string | null; // For preview or existing URL
+  image_file: File | null; // For new file to upload
+  image_suggestion: string | null; // For AI suggestion
+};
+
+// ✅ MODIFIED AI response type
+type AiQuizResponse = {
+  title: string;
+  questions: {
+    text: string;
+    image_suggestion: string; // Added image suggestion
+    options: { text: string }[];
+    correctAnswerText: string;
+  }[];
 };
 
 export default function CreateQuizPage() {
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
-
-  // --- New State ---
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  // ✅ Add state for cover image
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>(
     null,
   );
-  // -----------------
 
-  // --- Quiz Management (No changes) ---
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiQuestionLimit, setAiQuestionLimit] = useState(10);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  // --- Quiz Management ---
   const addQuestion = () => {
     const newQuestion: Question = {
       id: crypto.randomUUID(),
       text: "",
       options: [],
       correctAnswerId: null,
+      image_url: null, // ✅ ADDED
+      image_file: null, // ✅ ADDED
+      image_suggestion: null, // ✅ ADDED
     };
     setQuestions([...questions, newQuestion]);
   };
@@ -71,6 +105,38 @@ export default function CreateQuizPage() {
       questions.map((q) => (q.id === questionId ? { ...q, text } : q)),
     );
   };
+
+  // ✅ --- NEW Question Image Handlers ---
+  const handleQuestionFileChange = (
+    questionId: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const previewUrl = URL.createObjectURL(file);
+      setQuestions(
+        questions.map((q) =>
+          q.id === questionId
+            ? {
+                ...q,
+                image_file: file,
+                image_url: previewUrl,
+                image_suggestion: null, // Clear suggestion on manual upload
+              }
+            : q,
+        ),
+      );
+    }
+  };
+
+  const removeQuestionImage = (questionId: string) => {
+    setQuestions(
+      questions.map((q) =>
+        q.id === questionId ? { ...q, image_file: null, image_url: null } : q,
+      ),
+    );
+  };
+  // ------------------------------------
 
   // --- Option Management (No changes) ---
   const addOption = (questionId: string) => {
@@ -127,93 +193,182 @@ export default function CreateQuizPage() {
     );
   };
 
-  // --- Updated Save Quiz Logic ---
-  // This entire function has been replaced with the corrected version.
+  // --- ✅ MODIFIED Save Quiz Logic ---
   const handleSaveQuiz = async () => {
     setIsLoading(true);
     setError(null);
     const supabase = createClient();
 
-    // 1. Get the current user
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      setError("You must be logged in to create a quiz.");
-      setIsLoading(false);
-      return;
-    }
-
-    // ✅ 1. Generate a new UUID for the quiz ID *before* anything else
-    const newQuizId = crypto.randomUUID();
-    let coverImageUrl: string | null = null;
-
-    // 2. Upload cover image if one is selected
-    if (coverImageFile) {
-      // ✅ 2. Use the newQuizId in the file path
-      const filePath = `${user.id}/${newQuizId}-${coverImageFile.name}`;
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("quiz_covers")
-        .upload(filePath, coverImageFile, {
-          cacheControl: "3600",
-          upsert: true, // Use upsert in case user retries
-        });
-
-      if (uploadError) {
-        setError(`Failed to upload image: ${uploadError.message}`);
-        setIsLoading(false);
-        return;
+    try {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error("You must be logged in to create a quiz.");
       }
 
-      // 3. Get the public URL
-      const { data: publicUrlData } = supabase.storage
-        .from("quiz_covers")
-        .getPublicUrl(uploadData.path);
+      const newQuizId = crypto.randomUUID();
+      let coverImageUrl: string | null = null;
 
-      if (!publicUrlData) {
-        setError("Failed to get public URL for image.");
-        setIsLoading(false);
-        return;
+      // 1. Upload cover image (if any)
+      if (coverImageFile) {
+        const filePath = `${user.id}/${newQuizId}-${coverImageFile.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("quiz_covers")
+          .upload(filePath, coverImageFile, {
+            cacheControl: "3600",
+            upsert: true,
+          });
+
+        if (uploadError) {
+          throw new Error(`Failed to upload cover image: ${uploadError.message}`);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("quiz_covers")
+          .getPublicUrl(uploadData.path);
+        coverImageUrl = publicUrlData?.publicUrl || null;
       }
-      coverImageUrl = publicUrlData.publicUrl;
-    }
 
-    // ✅ 3. Define a specific type for our new quiz data
-    type QuizInsertData = {
-      id: string;
-      user_id: string;
-      title: string;
-      questions: Question[];
-      cover_image_url: string | null;
-    };
+      // 2. Upload all question images (if any)
+      const questionsWithUploadedImages = await Promise.all(
+        questions.map(async (q) => {
+          if (!q.image_file) {
+            // No new file, return question as-is
+            return q;
+          }
 
-    // 4. Prepare the final data for insertion (replaces 'any' type)
-    const quizData: QuizInsertData = {
-      id: newQuizId, // ✅ 4. Pass the new ID to the database
-      user_id: user.id,
-      title: title,
-      questions: questions,
-      cover_image_url: coverImageUrl,
-    };
+          // We have a new file, upload it
+          const filePath = `${user.id}/${newQuizId}/${q.id}-${q.image_file.name}`;
+          const { data: uploadData, error: uploadError } =
+            await supabase.storage
+              .from("quiz_covers") // Using same bucket
+              .upload(filePath, q.image_file, {
+                cacheControl: "3600",
+                upsert: true,
+              });
 
-    // 5. Insert into the 'quizzes' table
-    const { error: insertError } = await supabase
-      .from("quizzes")
-      .insert(quizData); // Insert the single, complete object
+          if (uploadError) {
+            throw new Error(
+              `Image upload failed for question "${q.text}": ${uploadError.message}`,
+            );
+          }
 
-    if (insertError) {
-      setError(insertError.message);
-      setIsLoading(false);
-    } else {
+          const { data: publicUrlData } = supabase.storage
+            .from("quiz_covers")
+            .getPublicUrl(uploadData.path);
+
+          if (!publicUrlData) {
+            throw new Error("Failed to get public URL for question image.");
+          }
+
+          // Return the question with the new public URL
+          return {
+            ...q,
+            image_url: publicUrlData.publicUrl,
+            image_file: null, // Clear the local file
+          };
+        }),
+      );
+
+      // 3. Prepare final data for DB (strip client-side properties)
+      const questionsForDb = questionsWithUploadedImages.map((q) => ({
+        id: q.id,
+        text: q.text,
+        options: q.options,
+        correctAnswerId: q.correctAnswerId,
+        image_url: q.image_url,
+      }));
+
+      type QuizInsertData = {
+        id: string;
+        user_id: string;
+        title: string;
+        questions: typeof questionsForDb;
+        cover_image_url: string | null;
+      };
+
+      const quizData: QuizInsertData = {
+        id: newQuizId,
+        user_id: user.id,
+        title: title,
+        questions: questionsForDb,
+        cover_image_url: coverImageUrl,
+      };
+
+      // 4. Insert into 'quizzes' table
+      const { error: insertError } = await supabase
+        .from("quizzes")
+        .insert(quizData);
+
+      if (insertError) {
+        throw new Error(`Failed to save quiz: ${insertError.message}`);
+      }
+
       // Success! Redirect to the dashboard.
       router.push("/dashboard");
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // ✅ New handler for file input change
+  // --- ✅ MODIFIED AI Quiz Generation Handler ---
+  const handleGenerateAiQuiz = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsAiLoading(true);
+    setAiError(null);
+
+    try {
+      const result = await generateQuizWithAI(aiPrompt, aiQuestionLimit);
+
+      if (result.error) throw new Error(result.error);
+      if (!result.data) throw new Error("No data returned from AI.");
+
+      const aiQuiz = result.data as AiQuizResponse;
+
+      setTitle(aiQuiz.title);
+
+      const newQuestions: Question[] = aiQuiz.questions.map((aiQ) => {
+        const newQuestionId = crypto.randomUUID();
+        let correctOptionId: string | null = null;
+
+        const newOptions: Option[] = aiQ.options.map((aiOpt) => {
+          const newOptionId = crypto.randomUUID();
+          if (aiOpt.text === aiQ.correctAnswerText) {
+            correctOptionId = newOptionId;
+          }
+          return { id: newOptionId, text: aiOpt.text };
+        });
+
+        if (!correctOptionId && newOptions.length > 0) {
+          console.warn("AI correct answer text didn't match. Defaulting.");
+          correctOptionId = newOptions[0].id;
+        }
+
+        return {
+          id: newQuestionId,
+          text: aiQ.text,
+          options: newOptions,
+          correctAnswerId: correctOptionId,
+          image_url: null,
+          image_file: null,
+          image_suggestion: aiQ.image_suggestion || null, // ✅ Save suggestion
+        };
+      });
+
+      setQuestions(newQuestions);
+      setIsAiModalOpen(false);
+      setAiPrompt("");
+    } catch (error: any) {
+      setAiError(error.message || "Failed to generate quiz.");
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -230,6 +385,62 @@ export default function CreateQuizPage() {
           <Button variant="ghost" asChild>
             <Link href="/dashboard">Cancel</Link>
           </Button>
+
+          {/* AI GENERATOR BUTTON & MODAL (No changes here) */}
+          <AlertDialog open={isAiModalOpen} onOpenChange={setIsAiModalOpen}>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Generate with AI
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Generate Quiz with AI</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Describe the topic for your quiz, and AI will generate
+                  questions for you.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="ai-prompt">Quiz Topic</Label>
+                  <Input
+                    id="ai-prompt"
+                    placeholder="e.g., World Geography, Anime: One Piece"
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ai-limit">Number of Questions</Label>
+                  <Input
+                    id="ai-limit"
+                    type="number"
+                    value={aiQuestionLimit}
+                    onChange={(e) => setAiQuestionLimit(Number(e.target.value))}
+                    min="1"
+                    max="20"
+                  />
+                </div>
+                {aiError && <p className="text-sm text-destructive">{aiError}</p>}
+              </div>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleGenerateAiQuiz}
+                  disabled={isAiLoading}
+                >
+                  {isAiLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {isAiLoading ? "Generating..." : "Generate"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          {/* ---------------------------------- */}
+
           <Button onClick={handleSaveQuiz} disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Quiz"}
           </Button>
@@ -251,8 +462,6 @@ export default function CreateQuizPage() {
             className="text-lg"
           />
         </CardContent>
-
-        {/* ✅ Add Cover Image Upload Section */}
         <CardContent>
           <Label htmlFor="cover-image">Cover Image</Label>
           <Input
@@ -267,7 +476,7 @@ export default function CreateQuizPage() {
               <Image
                 src={coverImagePreview}
                 alt="Cover image preview"
-                fill // This prop is now correct (not layout="fill")
+                fill
                 className="rounded-md object-cover"
               />
             </div>
@@ -275,7 +484,7 @@ export default function CreateQuizPage() {
         </CardContent>
       </Card>
 
-      {/* Questions List (No changes below this line) */}
+      {/* ✅ MODIFIED Questions List */}
       <div className="space-y-6">
         {questions.map((q, index) => (
           <Card key={q.id}>
@@ -309,12 +518,50 @@ export default function CreateQuizPage() {
                 />
               </div>
 
+              {/* ✅ NEW: Question Image Input */}
+              <div className="mt-4">
+                <Label htmlFor={`q-${q.id}-image`}>Question Image</Label>
+                <Input
+                  id={`q-${q.id}-image`}
+                  type="file"
+                  accept="image/png, image/jpeg"
+                  onChange={(e) => handleQuestionFileChange(q.id, e)}
+                  className="file:text-primary file:font-medium"
+                />
+                {q.image_suggestion && !q.image_url && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    AI suggestion: &ldquo;{q.image_suggestion}&rdquo;
+                  </p>
+                )}
+                {q.image_url && (
+                  <div className="mt-2 relative w-full h-40">
+                    <Image
+                      src={q.image_url} // This shows the object URL preview
+                      alt="Question image preview"
+                      fill
+                      className="rounded-md object-contain"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => removeQuestionImage(q.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+              {/* --------------------------- */}
+
               {/* Options List */}
-              <div className="space-y-2">
+              <div className="space-y-2 mt-4">
                 <Label>Options</Label>
                 {q.options.map((opt) => (
                   <div key={opt.id} className="flex items-center gap-2">
                     <Button
+                      type="button"
                       variant="outline"
                       size="icon"
                       onClick={() => setCorrectAnswer(q.id, opt.id)}
@@ -338,6 +585,7 @@ export default function CreateQuizPage() {
                       }
                     />
                     <Button
+                      type="button"
                       variant="ghost"
                       size="icon"
                       className="text-destructive shrink-0"
@@ -351,6 +599,7 @@ export default function CreateQuizPage() {
 
               {/* Add Option Button */}
               <Button
+                type="button"
                 variant="outline"
                 className="mt-2"
                 onClick={() => addOption(q.id)}
@@ -364,6 +613,7 @@ export default function CreateQuizPage() {
 
       {/* Add Question Button */}
       <Button
+        type="button"
         variant="secondary"
         className="w-full mt-6"
         onClick={addQuestion}

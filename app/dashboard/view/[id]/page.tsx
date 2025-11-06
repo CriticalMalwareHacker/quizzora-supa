@@ -11,11 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle, Circle } from "lucide-react";
 import Link from "next/link";
-
-// corrected import path
 import { type Quiz } from "../../quiz-list";
 import { cn } from "@/lib/utils";
-// ✅ Import Image
 import Image from "next/image";
 
 async function getQuiz(id: string) {
@@ -40,13 +37,12 @@ async function getQuiz(id: string) {
   return quiz as Quiz;
 }
 
-// ✅ For Next 15+: params is a Promise
 export default async function ViewQuizPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // await the params Promise
+  const { id } = await params;
   const quiz = await getQuiz(id);
 
   if (!quiz) {
@@ -76,13 +72,13 @@ export default async function ViewQuizPage({
       </Button>
 
       <Card className="mb-6 overflow-hidden">
-        {/* ✅ Display Cover Image */}
         {quiz.cover_image_url && (
           <div className="relative w-full h-48 md:h-64">
             <Image
               src={quiz.cover_image_url}
               alt={quiz.title || "Quiz cover image"}
-              layout="fill"
+              layout="fill" // Note: `layout="fill"` is deprecated in Next 13+, but use `fill` if so
+              fill
               className="object-cover"
             />
           </div>
@@ -103,6 +99,7 @@ export default async function ViewQuizPage({
         </CardHeader>
       </Card>
 
+      {/* ✅ MODIFIED Question Display */}
       <div className="space-y-6">
         {quiz.questions?.map((q, index) => (
           <Card key={q.id}>
@@ -112,6 +109,19 @@ export default async function ViewQuizPage({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
+              {/* ✅ NEW: Display image if it exists */}
+              {q.image_url && (
+                <div className="relative w-full h-48 mb-4">
+                  <Image
+                    src={q.image_url}
+                    alt={`Image for question ${index + 1}`}
+                    fill
+                    className="rounded-md object-contain"
+                  />
+                </div>
+              )}
+              {/* -------------------------------- */}
+
               {q.options.map((opt) => (
                 <div
                   key={opt.id}

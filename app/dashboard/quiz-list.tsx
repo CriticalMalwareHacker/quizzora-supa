@@ -36,6 +36,7 @@ type Question = {
   text: string;
   options: Option[];
   correctAnswerId: string | null;
+  image_url: string | null; // ✅ ADD THIS LINE
 };
 
 // This is the shape of the data we're getting from the 'quizzes' table
