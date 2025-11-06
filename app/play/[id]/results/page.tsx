@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Award } from "lucide-react";
+import { Award } from "lucide-react";
 import Link from "next/link";
 
 export default function ResultsPage({

@@ -5,6 +5,12 @@ import { PlayQuizForm } from "./play-quiz-form";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 
+// ✅ FIX: Define local types based on the imported Quiz type
+// This is the shape of a single question *with* the answer
+type QuestionWithAnswer = NonNullable<Quiz["questions"]>[number];
+// This is the shape of a single option
+type Option = QuestionWithAnswer["options"][number];
+
 // Fetch quiz data, but strip the answers
 async function getPlayerQuiz(id: string) {
   const supabase = await createClient();
@@ -20,10 +26,12 @@ async function getPlayerQuiz(id: string) {
   }
 
   // CRITICAL: Strip the correct answers before sending to the client
-  const playerQuestions = quiz.questions?.map((q: any) => ({
+  // ✅ FIX: Replaced 'any' with the specific 'QuestionWithAnswer' type
+  const playerQuestions = quiz.questions?.map((q: QuestionWithAnswer) => ({
     id: q.id,
     text: q.text,
-    options: q.options.map((opt: any) => ({ id: opt.id, text: opt.text })),
+    // ✅ FIX: Replaced 'any' with the specific 'Option' type
+    options: q.options.map((opt: Option) => ({ id: opt.id, text: opt.text })),
     // correctAnswerId is intentionally removed
   }));
 
@@ -59,7 +67,7 @@ export default async function PlayQuizPage({
             <CardTitle className="text-2xl">{quiz.title}</CardTitle>
           </CardHeader>
         </Card>
-        
+
         {/* Pass the answer-less quiz to the client form */}
         <PlayQuizForm quiz={quiz} />
       </div>
