@@ -58,10 +58,9 @@ export default function ProtectedLayout({
             
             <SidebarLogo />
 
-            <div className="flex flex-col space-y-4 flex-1">
-              {sidebarLinks.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
+           <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
+              <IconLogout className="h-5 w-5 text-red-500" />
+              <LogoutButton />
             </div>
 
             <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
