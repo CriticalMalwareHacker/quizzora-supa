@@ -151,7 +151,7 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
     );
   };
 
-  // --- Update quiz (uploads + db update) ---
+  // --- Update quiz (uploads + db update) - REMOVED is_public ---
   const handleUpdateQuiz = async () => {
     setIsLoading(true);
     setError(null);
@@ -228,6 +228,7 @@ export function EditForm({ quiz }: { quiz: Quiz }) {
         title,
         questions: questionsWithUploadedImages,
         cover_image_url: updatedCoverUrl,
+        // REMOVED is_public 
       };
 
       const { error: updateError } = await supabase

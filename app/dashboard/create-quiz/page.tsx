@@ -193,7 +193,7 @@ export default function CreateQuizPage() {
     );
   };
 
-  // --- ✅ MODIFIED Save Quiz Logic ---
+  // --- ✅ MODIFIED Save Quiz Logic - REMOVED is_public ---
   const handleSaveQuiz = async () => {
     setIsLoading(true);
     setError(null);
@@ -287,6 +287,7 @@ export default function CreateQuizPage() {
         title: string;
         questions: typeof questionsForDb;
         cover_image_url: string | null;
+        // REMOVED is_public
       };
 
       const quizData: QuizInsertData = {
@@ -295,6 +296,7 @@ export default function CreateQuizPage() {
         title: title,
         questions: questionsForDb,
         cover_image_url: coverImageUrl,
+        // REMOVED is_public: false, 
       };
 
       // 4. Insert into 'quizzes' table
@@ -375,7 +377,7 @@ export default function CreateQuizPage() {
         setAiError(String(error) || "Failed to generate quiz.");
       }
     } finally {
-      setIsAiLoading(false);
+      setIsLoading(false);
     }
   };
 

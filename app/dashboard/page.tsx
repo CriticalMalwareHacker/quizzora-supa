@@ -15,12 +15,11 @@ export default async function ProtectedPage() {
     redirect("/auth/login");
   }
 
-  // --- MODIFIED: Fetch Quizzes ---
-  // We've added .eq('user_id', data.claims.sub) to filter by the logged-in user
+  // --- MODIFIED: Fetch Quizzes - REMOVED is_public ---
   const { data: quizzes, error: quizError } = await supabase
     .from("quizzes")
-    .select("id, title, created_at, questions, cover_image_url")
-    .eq("user_id", data.claims.sub) // ✅ ADD THIS LINE
+    .select("id, title, created_at, questions, cover_image_url") // REMOVED is_public
+    .eq("user_id", data.claims.sub) 
     .order("created_at", { ascending: false });
 
   if (quizError) {

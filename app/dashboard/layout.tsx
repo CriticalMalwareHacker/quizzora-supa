@@ -3,12 +3,13 @@ import {
   IconHome,
   IconSettings,
   IconUser,
+  IconLogout,
   IconUsersGroup,
   IconPlayerPlay,
-  IconBuildingStore, // Corrected import
+  // REMOVED: IconChartBar and IconBuildingStore
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
-import { SidebarLogo } from "@/components/sidebar-logo"; // ✅ Added missing import
+import { SidebarLogo } from "@/components/sidebar-logo"; 
 
 const sidebarLinks = [
   {
@@ -16,11 +17,8 @@ const sidebarLinks = [
     href: "/dashboard",
     icon: <IconHome className="h-5 w-5" />,
   },
-  {
-    label: "Marketplace", 
-    href: "/dashboard/marketplace",
-    icon: <IconBuildingStore className="h-5 w-5" />, // Corrected icon usage
-  },
+  // REMOVED Marketplace Link
+  // REMOVED Statistics Link
   {
     label: "Profile",
     href: "/dashboard/profile",
@@ -55,16 +53,14 @@ export default function ProtectedLayout({
           <div className="flex flex-col h-full">
             <SidebarLogo />
 
-            {/* Map over the sidebarLinks here */}
             <div className="flex flex-col space-y-4 flex-1 mt-6">
               {sidebarLinks.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
             </div>
 
-            {/* Logout Button */}
             <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700">
-              <LogoutButton />
+              <LogoutButton /> 
             </div>
           </div>
         </SidebarBody>
