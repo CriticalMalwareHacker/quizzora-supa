@@ -3,8 +3,12 @@ import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import { type User } from "@supabase/supabase-js";
 import { UpdateProfileForm } from "@/components/update-profile-form";
-// ✅ Import the new icons
-import { IconMapPin, IconMail, IconFileText, IconPlayerPlay } from "@tabler/icons-react"; 
+import {
+  IconMapPin,
+  IconMail,
+  IconFileText,
+  IconPlayerPlay,
+} from "@tabler/icons-react";
 
 // Helper function to get the display name
 function getDisplayName(user: User) {
@@ -24,16 +28,23 @@ export default async function ProfilePage() {
     redirect("/auth/login");
   }
 
-  // ✅ --- ADDED: Fetch user's stats ---
+  // --- 1. Fetch user's "Quizzes Created" stats ---
   const { count: quizCount, error: countError } = await supabase
     .from("quizzes")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id);
-  
-  // (You would fetch real data for quizzes played from your DB)
+
+  // --- 2. Fetch user's "Quizzes Played" stats ---
+  const { count: playedCount, error: playedError } = await supabase
+    .from("quiz_submissions")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
+  // ---------------------------------------------
+
   const quizzesCreated = countError ? 0 : quizCount || 0;
-  const quizzesPlayed = 0; // Placeholder
-  // ---------------------------------
+  // --- 3. Use the fetched count ---
+  const quizzesPlayed = playedError ? 0 : playedCount || 0;
+  // -----------------------------
 
   const email = user.email || "No email provided";
   const avatarUrl =
@@ -43,9 +54,6 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* ✅ Removed the "Welcome" H1, as it's redundant */}
-
-      {/* ✅ --- MODIFIED: Streamlined Profile Card --- */}
       <div className="relative flex flex-col w-full min-w-0 break-words border border-dashed bg-clip-border rounded-2xl border-stone-200 bg-light/30 dark:bg-neutral-800/30">
         {/* Card Body */}
         <div className="p-6 md:p-8 flex-auto min-h-[70px] bg-transparent">
@@ -84,8 +92,8 @@ export default async function ProfilePage() {
                   </div>
                 </div>
               </div>
-              
-              {/* ✅ --- REPLACED: New Stats Section --- */}
+
+              {/* Stats Section */}
               <div className="mt-4 flex flex-wrap gap-6">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <IconFileText className="w-5 h-5" />
@@ -97,22 +105,16 @@ export default async function ProfilePage() {
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <IconPlayerPlay className="w-5 h-5" />
                   <span className="font-medium text-foreground text-base">
-                    {quizzesPlayed}
+                    {quizzesPlayed}{" "}
+                    {/* --- 4. This now uses the dynamic count --- */}
                   </span>
                   Quizzes Played
                 </div>
-                {/* Add "Streak" here when data is available */}
               </div>
-              {/* ------------------------------------ */}
-
             </div>
           </div>
-          
-          {/* ✅ REMOVED: Deleted the <hr> and <ul> for the tabs */}
         </div>
       </div>
-      {/* --------------------------------------------- */}
-
 
       {/* Profile Edit Form */}
       <UpdateProfileForm user={user} />

@@ -3,9 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { type Quiz } from "@/app/dashboard/quiz-list";
-import { v4 as uuidv4 } from "uuid"; // ✅ 1. Import uuid
+import { v4 as uuidv4 } from "uuid";
 
-// ✅ 2. Update function signature to accept playerName
 export async function submitQuiz(
   quizId: string,
   answers: Map<string, string>,
@@ -13,7 +12,13 @@ export async function submitQuiz(
 ) {
   const supabase = await createClient();
 
-  // 1. Securely fetch the quiz data *with* the answers
+  // --- 1. GET THE LOGGED-IN USER ---
+  // We do this to associate the submission with an account, if one exists.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 2. Securely fetch the quiz data *with* the answers
   const { data: quiz, error } = await supabase
     .from("quizzes")
     .select("questions")
@@ -21,15 +26,17 @@ export async function submitQuiz(
     .single();
 
   if (error || !quiz) {
+    console.error("Quiz not found error:", error);
     return { error: "Quiz not found." };
   }
 
   const questions = quiz.questions as Quiz["questions"];
   if (!questions) {
+    console.error("No questions found for this quiz.");
     return { error: "No questions found for this quiz." };
   }
 
-  // 2. Grade the quiz
+  // 3. Grade the quiz
   let score = 0;
   for (const question of questions) {
     if (answers.get(question.id) === question.correctAnswerId) {
@@ -38,7 +45,7 @@ export async function submitQuiz(
   }
   const total = questions.length;
 
-  // ✅ 3. Save the submission to the database
+  // 4. Save the submission to the database
   const submissionId = uuidv4();
   const { error: submissionError } = await supabase
     .from("quiz_submissions")
@@ -48,6 +55,7 @@ export async function submitQuiz(
       player_name: playerName,
       score: score,
       total: total,
+      user_id: user?.id || null, // --- This is the new line ---
     });
 
   if (submissionError) {
@@ -55,11 +63,11 @@ export async function submitQuiz(
     // Continue anyway, but log the error
   }
 
-  // 4. Serialize the answers Map to pass in the URL
+  // 5. Serialize the answers Map to pass in the URL
   const answersString = JSON.stringify(Array.from(answers.entries()));
   const encodedAnswers = encodeURIComponent(answersString);
 
-  // 5. Redirect to the results page with score, total, answers, and new submissionId
+  // 6. Redirect to the results page
   redirect(
     `/play/${quizId}/results?score=${score}&total=${total}&answers=${encodedAnswers}&submissionId=${submissionId}`,
   );
