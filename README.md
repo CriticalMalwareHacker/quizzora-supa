@@ -1,13 +1,13 @@
-\<h1 align="center"\>Quizzora\</h1\>
+<h1 align="center">Quizzora</h1>
 
-\<p align="center"\>
-\<strong\>Create, share, and play quizzes in minutes.\</strong\>
-\<br /\>
+<p align="center">
+<strong>Create, share, and play quizzes in minutes.</strong>
+<br>
 Quizzora is a full-stack, AI-powered quiz-building application built with Next.js and Supabase.
-\</p\>
+</p>
 
-\<p align="center"\>
-\</p\>
+<p align="center">
+</p>
 
 ## ✨ Features
 
