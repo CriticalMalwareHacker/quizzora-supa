@@ -8,7 +8,7 @@ import {
   IconBuildingStore, // Corrected import
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
-import { SidebarLogo } from "@/components/sidebar-logo";
+import { SidebarLogo } from "@/components/sidebar-logo"; // ✅ Added missing import
 
 const sidebarLinks = [
   {
