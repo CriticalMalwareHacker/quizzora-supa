@@ -2,11 +2,9 @@ import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconHome,
   IconSettings,
-  IconUser,
-  IconLogout, // This import is now used by the div below
+  IconUser, // This import is now used by the div below
   IconUsersGroup,
   IconPlayerPlay,
-  IconChartBar,
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
 import { SidebarLogo } from "@/components/sidebar-logo";
