@@ -3,13 +3,13 @@ import {
   IconHome,
   IconSettings,
   IconUser,
-  IconLogout,
+  IconLogout, // This import is now used by the div below
   IconUsersGroup,
   IconPlayerPlay,
-  IconChartBar, // ✅ 1. Import the new icon
+  IconChartBar,
 } from "@tabler/icons-react";
 import { LogoutButton } from "@/components/logout-button";
-import { SidebarLogo } from "@/components/sidebar-logo"; // ✅ Added missing import
+import { SidebarLogo } from "@/components/sidebar-logo";
 
 const sidebarLinks = [
   {
@@ -18,11 +18,6 @@ const sidebarLinks = [
     icon: <IconHome className="h-5 w-5" />,
   },
   // ✅ 2. Add the new Statistics link
-  {
-    label: "Statistics",
-    href: "/dashboard/stats",
-    icon: <IconChartBar className="h-5 w-5" />,
-  },
   {
     label: "Profile",
     href: "/dashboard/profile",
@@ -64,9 +59,8 @@ export default function ProtectedLayout({
               ))}
             </div>
 
-            {/* ✅ Removed the duplicate logout section */}
-            <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
-              <IconLogout className="h-5 w-5 text-red-500" />
+            {/* ✅ FIX: Removed the extra <IconLogout />. The LogoutButton component renders itself. */}
+            <div className="mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700">
               <LogoutButton />
             </div>
           </div>
