@@ -1,105 +1,181 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+\<h1 align="center"\>Quizzora\</h1\>
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+\<p align="center"\>
+\<strong\>Create, share, and play quizzes in minutes.\</strong\>
+\<br /\>
+Quizzora is a full-stack, AI-powered quiz-building application built with Next.js and Supabase.
+\</p\>
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+\<p align="center"\>
+\</p\>
 
-## Features
+## ✨ Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+Quizzora is a feature-rich platform that demonstrates a complete, modern web application workflow:
 
-## Demo
+  * **🤖 AI Quiz Generation:** Instantly create quizzes from a simple text prompt using the OpenAI API (gpt-4o-mini). The AI generates a title, questions, 4 multiple-choice options, a correct answer, and even an image suggestion for each question.
+  * **🧑‍🎨 Manual Quiz Creator:** A full-featured editor to manually create and edit quizzes. Add a title, upload a custom cover image, and build out questions with text, options, and question-specific images.
+  * **🔒 Authentication:** Secure user authentication (sign-up, sign-in, password reset) handled by Supabase Auth. Supports both email/password and Google OAuth.
+  * **🚀 Quiz Hosting & Sharing:** Host your created quizzes and share them via a unique, shareable link or a scannable QR code.
+  * **🎮 Interactive Quiz Player:** A clean, multi-step form for users to play quizzes. It asks for a player's name to identify them on the leaderboard.
+  * **📈 Live Leaderboards:** View results on a live-polling (5-second refresh) leaderboard for any quiz you're hosting.
+  * **📝 Results & Review:** After completing a quiz, users see their score (e.g., "8/10") and percentage, along with a detailed review of their answers against the correct ones.
+  * **👤 User Profile & Stats:** A dedicated user profile page where users can update their public information (username, full name, location) and view their stats, such as "Quizzes Created" and "Quizzes Played".
+  * **🎨 Dashboard & UI:** Built with **shadcn/ui** and **Tailwind CSS**, featuring a beautiful 3D card layout for the quiz list and a light/dark mode theme switcher.
+  * **🌐 Public Landing Page:** A fully animated, responsive landing page to attract new users, complete with feature, pricing, and testimonial sections.
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## 🔧 Tech Stack
 
-## Deploy to Vercel
+  * **Framework:** [Next.js](https://nextjs.org/) (App Router)
+  * **Backend & Database:** [Supabase](https://supabase.com/)
+      * **Auth:** Supabase Auth (including SSR)
+      * **Database:** Supabase Postgres
+      * **Storage:** Supabase Storage (for cover & question images)
+  * **AI:** [OpenAI API](https://openai.com/) (gpt-4o-mini)
+  * **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
+  * **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+  * **Animations:** [Framer Motion (motion/react)](https://www.framer.com/motion/)
+  * **Icons:** [Tabler Icons](https://tabler-icons.io/) & [Lucide React](https://lucide.dev/)
 
-Vercel deployment will guide you through creating a Supabase account and project.
+## 🚀 Getting Started
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+Follow these instructions to set up and run the project locally.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### 1\. Clone the Repository
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+```bash
+git clone https://github.com/criticalmalwarehacker/quizzora-supa.git
+cd quizzora-supa
+```
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 2\. Install Dependencies
 
-## Clone and run locally
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### 3\. Set up Supabase
 
-2. Create a Next.js app using the Supabase Starter template npx command
+1.  Go to [database.new](https://database.new) and create a new Supabase project.
+2.  Navigate to your project's **SQL Editor**.
+3.  Run the SQL script below to create the necessary tables (`quizzes`, `quiz_submissions`) and storage bucket (`quiz_covers`).
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+### 4\. Environment Variables
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+Rename `.env.example` (if one exists) or create a new file named `.env.local` in the project root. Add the following environment variables:
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+```env
+# Get these from your Supabase project's API settings
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
-3. Use `cd` to change into the app's directory
+# Get this from your OpenAI account
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+```
 
-   ```bash
-   cd with-supabase-app
-   ```
+  * The `OPENAI_API_KEY` is required for the AI quiz generation feature.
 
-4. Rename `.env.example` to `.env.local` and update the following:
+### 5\. Run the Development Server
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+```bash
+npm run dev
+```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+The app should now be running on [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000/).
 
-5. You can now run the Next.js local development server:
+-----
 
-   ```bash
-   npm run dev
-   ```
+## 🐘 Supabase Database Setup
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+Use the following SQL in your Supabase SQL Editor to set up the required tables, storage, and policies.
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+```sql
+-- 1. CREATE TABLE for quizzes
+CREATE TABLE public.quizzes (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title text,
+  questions jsonb,
+  cover_image_url text,
+  created_at timestamp with time zone NOT NULL DEFAULT now()
+);
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+-- 2. CREATE TABLE for quiz submissions
+CREATE TABLE public.quiz_submissions (
+  id uuid NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  quiz_id uuid NOT NULL REFERENCES public.quizzes(id) ON DELETE CASCADE,
+  user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL, -- Can be NULL for guest players
+  player_name text NOT NULL,
+  score integer NOT NULL,
+  total integer NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now()
+);
 
-## Feedback and issues
+-- 3. CREATE STORAGE BUCKET for quiz images
+-- Make sure this bucket is set to "Public"
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('quiz_covers', 'quiz_covers', true);
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+-- 4. ENABLE Row Level Security (RLS)
+ALTER TABLE public.quizzes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.quiz_submissions ENABLE ROW LEVEL SECURITY;
 
-## More Supabase examples
+-- 5. CREATE RLS POLICIES for 'quizzes' table
+CREATE POLICY "Allow public read access to quizzes"
+  ON public.quizzes
+  FOR SELECT USING (true);
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+CREATE POLICY "Allow authenticated users to insert quizzes"
+  ON public.quizzes
+  FOR INSERT TO authenticated WITH CHECK (true);
+
+CREATE POLICY "Allow owners to update their quizzes"
+  ON public.quizzes
+  FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Allow owners to delete their quizzes"
+  ON public.quizzes
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- 6. CREATE RLS POLICIES for 'quiz_submissions' table
+CREATE POLICY "Allow public read access to submissions"
+  ON public.quiz_submissions
+  FOR SELECT USING (true);
+
+CREATE POLICY "Allow anyone to insert a submission"
+  ON public.quiz_submissions
+  FOR INSERT WITH CHECK (true);
+
+-- 7. CREATE RLS POLICIES for 'quiz_covers' storage
+CREATE POLICY "Allow public read access to quiz covers"
+  ON storage.objects
+  FOR SELECT USING (bucket_id = 'quiz_covers');
+
+CREATE POLICY "Allow authenticated users to upload to their own folder"
+  ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (
+    bucket_id = 'quiz_covers' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+CREATE POLICY "Allow owners to update their files"
+  ON storage.objects
+  FOR UPDATE TO authenticated
+  USING (
+    bucket_id = 'quiz_covers' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+
+CREATE POLICY "Allow owners to delete their files"
+  ON storage.objects
+  FOR DELETE TO authenticated
+  USING (
+    bucket_id = 'quiz_covers' AND
+    auth.uid()::text = (storage.foldername(name))[1]
+  );
+```
