@@ -389,17 +389,24 @@ export default function CreateQuizPage() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+      {/* --- ✅ START: MODIFIED HEADER --- */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <h2 className="text-3xl font-bold">Create New Quiz</h2>
-        <div className="flex gap-2">
-          <Button variant="ghost" asChild>
+        <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+          <Button
+            variant="ghost"
+            asChild
+            className="w-full md:w-auto justify-center"
+          >
             <Link href="/dashboard">Cancel</Link>
           </Button>
 
-          {/* AI GENERATOR BUTTON & MODAL (No changes here) */}
           <AlertDialog open={isAiModalOpen} onOpenChange={setIsAiModalOpen}>
             <AlertDialogTrigger asChild>
-              <Button variant="outline">
+              <Button
+                variant="outline"
+                className="w-full md:w-auto justify-center"
+              >
                 <Sparkles className="mr-2 h-4 w-4" />
                 Generate with AI
               </Button>
@@ -449,13 +456,18 @@ export default function CreateQuizPage() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-          {/* ---------------------------------- */}
 
-          <Button onClick={handleSaveQuiz} disabled={isLoading}>
+          <Button
+            onClick={handleSaveQuiz}
+            disabled={isLoading}
+            className="w-full md:w-auto justify-center"
+          >
             {isLoading ? "Saving..." : "Save Quiz"}
           </Button>
         </div>
       </div>
+      {/* --- ✅ END: MODIFIED HEADER --- */}
+
 
       {/* Quiz Title Card */}
       <Card className="mb-6">
