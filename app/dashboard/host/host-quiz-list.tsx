@@ -51,7 +51,8 @@ export function HostQuizList({ quizzes }: { quizzes: Quiz[] }) {
       <div className="space-y-4">
         {quizzes.map((quiz) => (
           <Card key={quiz.id}>
-            <CardContent className="p-4 flex justify-between items-center">
+            {/* ✅ MODIFIED: Added flex-col, gap-4, and md:flex-row */}
+            <CardContent className="p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
               <div>
                 <CardTitle className="text-lg">
                   {quiz.title || "Untitled Quiz"}
@@ -63,37 +64,41 @@ export function HostQuizList({ quizzes }: { quizzes: Quiz[] }) {
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button asChild variant="ghost" size="sm">
+              {/* ✅ MODIFIED: Stack buttons vertically on mobile, row on md screens */}
+              <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                <Button asChild variant="ghost" className="w-full md:w-auto">
                   <Link href={`/dashboard/leaderboard/${quiz.id}`}>
                     <BarChart className="h-4 w-4 mr-2" />
                     Leaderboard
                   </Link>
                 </Button>
 
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleShowQrCode(quiz.id)}
-                >
-                  <QrCode className="h-4 w-4" />
-                </Button>
+                {/* ✅ MODIFIED: Grouped QR and Copy buttons for better mobile layout */}
+                <div className="flex gap-2 w-full md:w-auto">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleShowQrCode(quiz.id)}
+                  >
+                    <QrCode className="h-4 w-4" />
+                  </Button>
 
-                <Button
-                  variant="outline"
-                  onClick={() => handleCopyLink(quiz.id)}
-                  className="w-[130px]"
-                >
-                  {copiedQuizId === quiz.id ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2 text-green-600" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Clipboard className="h-4 w-4 mr-2" /> Copy Link
-                    </>
-                  )}
-                </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCopyLink(quiz.id)}
+                    className="w-full flex-1 md:w-[130px] md:flex-none" // Fills remaining space on mobile
+                  >
+                    {copiedQuizId === quiz.id ? (
+                      <>
+                        <Check className="h-4 w-4 mr-2 text-green-600" /> Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Clipboard className="h-4 w-4 mr-2" /> Copy Link
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
