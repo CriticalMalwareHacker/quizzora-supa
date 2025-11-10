@@ -94,16 +94,6 @@ export default function HeroSection() {
                                             Make your first quiz!
                                         </Link>
                                     </Button>
-
-                                    {/* Black Button (Login Style) */}
-                                    <Button
-                                        asChild
-                                        size="lg"
-                                        className="rounded-md px-6 py-2.5 text-base font-semibold bg-black text-white border border-black hover:bg-gray-900 transition-all duration-200 shadow-sm">
-                                        <Link href="#demo">
-                                            Request a demo
-                                        </Link>
-                                    </Button>
                                 </AnimatedGroup>
                             </div>
                         </div>
