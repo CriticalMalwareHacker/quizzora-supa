@@ -30,33 +30,44 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-// import { createClient } from "@/lib/supabase/client"; // Uncomment when implementing delete
-// import { useRouter } from "next/navigation"; // Uncomment when implementing delete
+// ✅ 1. Import the new server action
+import { deleteAccount } from "./actions";
+// ✅ 2. Import client-side supabase and router
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  // const router = useRouter(); // Uncomment when implementing delete
+  // ✅ 3. Initialize router and supabase client
+  const router = useRouter();
+  const supabase = createClient();
 
-  // This is a placeholder function.
-  // Deleting a user is a complex, secure operation that must be
-  // handled in a Server Action that calls `supabase.auth.admin.deleteUser(userId)`
+  // ✅ 4. Updated function to call the server action
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     setDeleteError(null);
-    
-    console.error("Account deletion must be implemented securely on the server.");
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setDeleteError("This feature is not yet implemented.");
-    setIsDeleting(false);
+    try {
+      // Call the server action
+      const result = await deleteAccount();
 
-    // On successful deletion, you would sign the user out and redirect:
-    // const supabase = createClient();
-    // await supabase.auth.signOut();
-    // router.push('/');
+      if (result?.error) {
+        throw new Error(result.error);
+      }
+
+      // If the server action redirect doesn't trigger,
+      // sign out client-side and push to home.
+      await supabase.auth.signOut();
+      router.push("/");
+    } catch (error) {
+      if (error instanceof Error) {
+        setDeleteError(error.message);
+      } else {
+        setDeleteError("An unknown error occurred.");
+      }
+      setIsDeleting(false);
+    }
   };
 
   return (
