@@ -51,10 +51,6 @@ cd quizzora-supa
 ### 2\. Install Dependencies
 
 ```bash
-npm install
-# or
-yarn install
-# or
 pnpm install
 ```
 
@@ -82,7 +78,7 @@ OPENAI_API_KEY=YOUR_OPENAI_API_KEY
 ### 5\. Run the Development Server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 The app should now be running on [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000/).
