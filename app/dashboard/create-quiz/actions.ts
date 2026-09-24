@@ -4,12 +4,13 @@ import OpenAI from "openai";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: "https://openrouter.ai/api/v1",
 });
 
 export async function generateQuizWithAI(prompt: string, limit: number) {
-  if (!process.env.OPENAI_API_KEY) {
-    return { error: "OPENAI_API_KEY is not set." };
+  if (!process.env.OPENROUTER_API_KEY) {
+    return { error: "OPENROUTER_API_KEY is not set." };
   }
 
   // This system prompt is crucial for getting the correct JSON structure
@@ -39,7 +40,7 @@ Ensure 'correctAnswerText' exactly matches the text of one of the options.`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Using a fast, cheap, and JSON-capable model
+      model: "openrouter/free",
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: systemPrompt },
