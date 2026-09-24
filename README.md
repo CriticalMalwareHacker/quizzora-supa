@@ -14,7 +14,7 @@ Quizzora is a full-stack, AI-powered quiz-building application built with Next.j
 
 Quizzora is a feature-rich platform that demonstrates a complete, modern web application workflow:
 
-- **🤖 AI Quiz Generation:** Instantly create quizzes from a simple text prompt using the OpenAI API (gpt-4o-mini). The AI generates a title, questions, 4 multiple-choice options, a correct answer, and even an image suggestion for each question.
+- **🤖 AI Quiz Generation:** Instantly create quizzes from a simple text prompt using OpenRouter (`openrouter/free`). The AI generates a title, questions, 4 multiple-choice options, a correct answer, and even an image suggestion for each question.
 - **🧑‍🎨 Manual Quiz Creator:** A full-featured editor to manually create and edit quizzes. Add a title, upload a custom cover image, and build out questions with text, options, and question-specific images.
 - **🔒 Authentication:** Secure user authentication (sign-up, sign-in, password reset) handled by Supabase Auth. Supports both email/password and Google OAuth.
 - **🚀 Quiz Hosting & Sharing:** Host your created quizzes and share them via a unique, shareable link or a scannable QR code.
@@ -32,7 +32,7 @@ Quizzora is a feature-rich platform that demonstrates a complete, modern web app
   - **Auth:** Supabase Auth (including SSR)
   - **Database:** Supabase Postgres
   - **Storage:** Supabase Storage (for cover & question images)
-- **AI:** [OpenAI API](https://openai.com/) (gpt-4o-mini)
+- **AI:** [OpenRouter](https://openrouter.ai/) (`openrouter/free`)
 - **UI Components:** [shadcn/ui](https://ui.shadcn.com/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Animations:** [Framer Motion (motion/react)](https://www.framer.com/motion/)
@@ -74,11 +74,11 @@ Rename `.env.example` (if one exists) or create a new file named `.env.local` in
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
-# Get this from your OpenAI account
-OPENAI_API_KEY=YOUR_OPENAI_API_KEY
+# Get this from your OpenRouter account
+OPENROUTER_API_KEY=YOUR_OPENROUTER_API_KEY
 ```
 
-- The `OPENAI_API_KEY` is required for the AI quiz generation feature.
+- The `OPENROUTER_API_KEY` is required for the AI quiz generation feature.
 
 ### 5\. Run the Development Server
 
